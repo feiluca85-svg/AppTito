@@ -353,7 +353,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const rawJson = jsonInputArea.value.trim();
-            const cleanJson = rawJson.replace(/```json/gi, '').replace(/```/g, '').trim();
+            let cleanJson = rawJson.replace(/```json/gi, '').replace(/```/g, '').trim();
+            
+            // Estrae solo la parte tra parentesi graffe per ignorare testo extra
+            const startIdx = cleanJson.indexOf('{');
+            const endIdx = cleanJson.lastIndexOf('}');
+            if (startIdx !== -1 && endIdx !== -1) {
+                cleanJson = cleanJson.substring(startIdx, endIdx + 1);
+            }
+
             const data = JSON.parse(cleanJson);
             
             weeksData[weekName] = {
