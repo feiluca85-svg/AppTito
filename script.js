@@ -130,13 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let editMode = false;
-    const metroColors = ['#a20025', '#f0a30a', '#00a300', '#2b5797', '#d3a300', '#881798', '#E3008C', '#008272', '#00aba9', '#6a00ff'];
+    const metroColors = ['#a20025', '#f0a30a', '#00a300', '#2b5797', '#d3a300', '#881798', '#E3008C', '#008272', '#00aba9', '#6a00ff', '#0050ef', '#1ba1e2'];
     const tileSizes = ['metro-tile', 'metro-tile tile-wide', 'metro-tile tile-large'];
 
     // Load Tile Preferences
     let tilePrefs = {};
     try {
         tilePrefs = JSON.parse(localStorage.getItem('pasto_pronto_tiles') || '{}');
+        // Forza il reset del colore del tileMenu per applicare il Cobalt Blue richiesto
+        if (tilePrefs['tileMenu'] && tilePrefs['tileMenu'].color !== '#0050ef') {
+            delete tilePrefs['tileMenu'].color;
+            localStorage.setItem('pasto_pronto_tiles', JSON.stringify(tilePrefs));
+        }
     } catch(e){}
 
     const saveTilePrefs = () => {
