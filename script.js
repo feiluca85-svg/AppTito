@@ -253,7 +253,43 @@ document.addEventListener('DOMContentLoaded', () => {
         weekKeys.forEach(key => {
             const div = document.createElement('div');
             div.className = 'sidebar-item' + (key === activeWeekId ? ' active' : '');
-            div.textContent = key;
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = key;
+            
+            const delBtn = document.createElement('button');
+            delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            delBtn.style.background = 'transparent';
+            delBtn.style.border = 'none';
+            delBtn.style.color = '#ff4d4d';
+            delBtn.style.cursor = 'pointer';
+            delBtn.style.fontSize = '1.1rem';
+            delBtn.style.padding = '5px';
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Previene il click sul div padre
+                if (confirm(`Vuoi davvero eliminare la settimana "${key}"?`)) {
+                    delete weeksData[key];
+                    if (activeWeekId === key) {
+                        const remaining = Object.keys(weeksData).sort().reverse();
+                        activeWeekId = remaining.length > 0 ? remaining[0] : null;
+                    }
+                    saveState();
+                    renderSidebar();
+                    updateHomePreviews();
+                    // Se siamo su una view di dettaglio e cancelliamo quella attiva, torniamo alla home per evitare errori
+                    if (document.getElementById('homeView').style.display === 'none') {
+                        showView(document.getElementById('homeView'));
+                    }
+                }
+            });
+
+            div.appendChild(textSpan);
+            div.appendChild(delBtn);
+
             div.addEventListener('click', () => {
                 activeWeekId = key;
                 saveState();
