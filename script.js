@@ -509,6 +509,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Menu Logic
+    const safeStringify = (data) => {
+        if (!data) return '-';
+        if (typeof data === 'string') return data.replace(/\n/g, '<br>');
+        if (Array.isArray(data)) return data.map(safeStringify).join('<br><br>');
+        if (typeof data === 'object') {
+            return Object.entries(data).map(([k, v]) => `<strong>${k}:</strong><br>${safeStringify(v)}`).join('<br><br>');
+        }
+        return String(data).replace(/\n/g, '<br>');
+    };
+
     const renderMenu = () => {
         const container = document.getElementById('menuDaysContainer');
         container.innerHTML = '';
@@ -526,6 +536,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accordionItem = document.createElement('div');
             accordionItem.className = 'accordion-item';
             
+            const bfast = safeStringify(dayData.breakfast);
+            const s1 = dayData.snack1 ? `<br><br><strong>Spuntino:</strong><br>${safeStringify(dayData.snack1)}` : '';
+            const lunch = safeStringify(dayData.lunch);
+            const s2 = dayData.snack2 ? `<br><br><strong>Merenda:</strong><br>${safeStringify(dayData.snack2)}` : '';
+            const dinner = safeStringify(dayData.dinner);
+
             accordionItem.innerHTML = `
                 <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
                     <span>${giorno} ${prepTime ? `<span style="font-size:0.9rem; color:#ccc; margin-left: 10px; text-transform:none;"><i class="fa-solid fa-stopwatch"></i> ${prepTime}</span>` : ''}</span>
@@ -534,19 +550,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="accordion-body">
                     <div class="menu-meal-block">
                         <div class="menu-meal-title">Colazione & Spuntino</div>
-                        <div class="menu-meal-content"><strong>Colazione:</strong> ${dayData.breakfast || '-'}
-${dayData.snack1 ? `<strong>Spuntino:</strong> ${dayData.snack1}` : ''}</div>
+                        <div class="menu-meal-content"><strong>Colazione:</strong><br>${bfast}${s1}</div>
                     </div>
                     <div class="menu-meal-block">
                         <div class="menu-meal-title">Pranzo & Merenda</div>
-                        <div class="menu-meal-content"><strong>Pranzo:</strong>
-${dayData.lunch || '-'}
-
-${dayData.snack2 ? `<strong>Merenda:</strong> ${dayData.snack2}` : ''}</div>
+                        <div class="menu-meal-content"><strong>Pranzo:</strong><br>${lunch}${s2}</div>
                     </div>
                     <div class="menu-meal-block">
                         <div class="menu-meal-title">Cena</div>
-                        <div class="menu-meal-content">${dayData.dinner || '-'}</div>
+                        <div class="menu-meal-content">${dinner}</div>
                     </div>
                 </div>
             `;
@@ -559,20 +571,26 @@ ${dayData.snack2 ? `<strong>Merenda:</strong> ${dayData.snack2}` : ''}</div>
         const container = document.getElementById('prepContainer');
         const activeData = activeWeekId ? weeksData[activeWeekId] : null;
         
-        if (!activeData || !activeData.mealPrep || activeData.mealPrep.length === 0) {
+        if (!activeData || !activeData.mealPrep || (Array.isArray(activeData.mealPrep) && activeData.mealPrep.length === 0)) {
             container.textContent = "Nessun meal prep trovato per questa settimana.";
         } else {
             container.innerHTML = '';
-            if (Array.isArray(activeData.mealPrep)) {
-                activeData.mealPrep.forEach(step => {
-                    const stepDiv = document.createElement('div');
-                    stepDiv.className = 'prep-step';
-                    stepDiv.innerHTML = step.replace(/\n/g, '<br>');
-                    container.appendChild(stepDiv);
-                });
-            } else {
-                container.innerHTML = activeData.mealPrep.replace(/\n/g, '<br>');
-            }
+            
+            const extractSteps = (data) => {
+                if (Array.isArray(data)) return data;
+                if (typeof data === 'object') return Object.values(data);
+                if (typeof data === 'string') return data.split(/\n+/).filter(s => s.trim().length > 0);
+                return [String(data)];
+            };
+
+            const steps = extractSteps(activeData.mealPrep);
+            
+            steps.forEach(step => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'prep-step';
+                stepDiv.innerHTML = safeStringify(step);
+                container.appendChild(stepDiv);
+            });
         }
     };
 
