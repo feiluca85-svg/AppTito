@@ -1,0 +1,491 @@
+:root {
+    --bg-main: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #999999;
+    
+    /* Metro Tile Colors */
+    --accent-blue: #0078D7;
+    --accent-green: #107C10;
+    --accent-orange: #D83B01;
+    --accent-purple: #881798;
+    --accent-pink: #E3008C;
+    --accent-teal: #008272;
+    
+    --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    line-height: 1.4;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+}
+
+/* Metro Pivot Header */
+.pivot-header {
+    position: relative;
+    padding: 40px 20px 10px 20px;
+    background: var(--bg-main);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pivot-title {
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: -1.5px;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.metro-icon-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-size: 1.2rem;
+}
+
+.metro-icon-btn:active {
+    background: white;
+    color: black;
+}
+
+/* Content Area & Grid */
+.content-area {
+    padding: 0 20px;
+}
+
+.metro-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.section-heading {
+    grid-column: span 2;
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+/* Tiles */
+.tile {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.tile:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+}
+
+.tile-square {
+    aspect-ratio: 1 / 1;
+}
+
+.tile-wide {
+    grid-column: span 2;
+    height: 150px;
+}
+
+.tile-large {
+    grid-column: span 2;
+    min-height: 200px;
+}
+
+/* Tile Colors */
+.tile-blue { background-color: var(--accent-blue); }
+.tile-green { background-color: var(--accent-green); }
+.tile-orange { background-color: var(--accent-orange); }
+.tile-purple { background-color: var(--accent-purple); }
+.tile-pink { background-color: var(--accent-pink); }
+.tile-teal { background-color: var(--accent-teal); }
+
+/* Tile Content */
+.tile-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.tile-title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: white;
+    align-self: flex-start;
+}
+
+.tile-value {
+    font-size: 3.5rem;
+    font-weight: 300;
+    line-height: 1;
+    align-self: flex-end;
+}
+
+.tile-value-small {
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1;
+    align-self: flex-end;
+    margin-top: auto;
+}
+
+.tile-center-icon {
+    font-size: 3rem;
+    align-self: center;
+    margin-top: 15px;
+}
+
+.tile-center-icon-large {
+    font-size: 4rem;
+    align-self: center;
+}
+
+.tile-icon-bg {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    font-size: 10rem;
+    opacity: 0.15;
+    z-index: 1;
+}
+
+/* Menu Details inside Tile */
+.menu-details {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1.3;
+}
+
+.menu-details .meal-name {
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.placeholder-text {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* Flyer Preview */
+.flyer-preview {
+    grid-column: span 2;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.flyer-preview img {
+    height: 80px;
+    border: 2px solid white;
+}
+
+/* Settings Modal (WP8 Fullscreen Page) */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg-main);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s;
+    overflow-y: auto;
+    padding-bottom: 30px;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px 20px 20px;
+}
+
+.settings-title {
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: -1.5px;
+    margin-bottom: 30px;
+    text-transform: lowercase;
+}
+
+.wizard-step h3 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--accent-blue);
+    margin-bottom: 20px;
+    text-transform: lowercase;
+}
+
+.metro-input {
+    width: 100%;
+    background: white;
+    border: 2px solid transparent;
+    color: black;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    margin-bottom: 15px;
+    transition: border-color 0.2s;
+}
+
+.metro-input:focus {
+    border-color: var(--accent-blue);
+    outline: none;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.metro-btn {
+    flex: 1;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.1s, color 0.1s;
+}
+
+.metro-btn.primary {
+    background: white;
+    color: black;
+}
+
+.metro-btn:active {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
+
+/* Loading */
+.loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #333;
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Wizard Styles */
+.wizard-step {
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.member-item, .voucher-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.member-item-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.remove-btn {
+    background: #e51400;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+select.metro-input {
+    background-color: #222;
+    color: white;
+    border: 2px solid transparent;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    outline: none;
+    transition: all 0.2s;
+    width: 100%;
+}
+select.metro-input:focus {
+    border-color: #00aff0;
+    background-color: #333;
+}
+
+/* Colori dinamici per membri */
+.tile-color-1 { background-color: #d80073; }
+.tile-color-2 { background-color: #a4c400; }
+.tile-color-3 { background-color: #1ba1e2; }
+.tile-color-4 { background-color: #f0a30a; }
+.tile-color-5 { background-color: #6a00ff; }
+.tile-color-6 { background-color: #825a2c; }
+
+/* View Transitions */
+.detail-view {
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar Item */
+.sidebar-item {
+    padding: 15px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    border-radius: 4px;
+}
+.sidebar-item:hover {
+    background: #555;
+}
+.sidebar-item.active {
+    background: var(--accent-blue);
+    font-weight: bold;
+}
+
+/* Tile Alignment Fixes */
+.metro-tile {
+    /* Existing properties... */
+    position: relative;
+    overflow: hidden;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.tile-content {
+    align-self: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    text-align: center;
+    z-index: 2;
+    width: 100%;
+}
+
+.tile-title {
+    font-size: 1.1rem;
+    font-weight: 400;
+    z-index: 2;
+    margin-top: auto;
+    text-align: left;
+    width: 100%;
+}
+
+.tile-bg-icon {
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    font-size: 8rem;
+    opacity: 0.15;
+    z-index: 1;
+    transform: rotate(-15deg);
+}
+
+/* Edit Mode Animation */
+.edit-mode-active .metro-tile {
+    animation: wobble 1s infinite alternate ease-in-out;
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+@keyframes wobble {
+    0% { transform: rotate(-1deg) scale(0.98); }
+    100% { transform: rotate(1deg) scale(1.02); }
+}
+
+/* Print Styles */
+@media print {
+    body { background: white; color: black; }
+    .pivot-header, .modal-overlay, #homeView { display: none !important; }
+    .detail-view { display: block !important; box-shadow: none; animation: none; }
+    .metro-btn, .metro-icon-btn, input, .fa-solid { display: none !important; }
+    .metro-tile { border: 1px solid #ccc; break-inside: avoid; background: white !important; color: black !important; }
+    .tile-title { color: black; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; }
+    #prepContainer { background: white !important; color: black !important; border: 1px solid #ccc; }
+    .grocery-checkbox { display: none !important; }
+    #groceryListContainer label { text-decoration: none !important; opacity: 1 !important; margin-bottom: 5px; }
+}
