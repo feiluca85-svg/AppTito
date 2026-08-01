@@ -694,35 +694,41 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Load initial views
+    // Booklet export function
+    window.exportMenuBooklet = () => {
+        // Ensure Meal Prep is rendered before trying to grab its HTML
+        if (typeof renderPrep === 'function') {
+            renderPrep();
+        }
+
+        const menuContainer = document.getElementById('menuDaysContainer');
+        const prepContainer = document.getElementById('prepContainer');
+        let injectedPrep = null;
+
+        if (menuContainer && prepContainer && prepContainer.innerHTML.trim() !== '') {
+            injectedPrep = document.createElement('div');
+            injectedPrep.className = 'accordion-item';
+            injectedPrep.innerHTML = `
+                <div class="accordion-header">
+                    MEAL PREP
+                </div>
+                <div class="accordion-body">
+                    ${prepContainer.innerHTML}
+                </div>
+            `;
+            menuContainer.appendChild(injectedPrep);
+        }
+
+        window.print();
+
+        setTimeout(() => {
+            if (injectedPrep && injectedPrep.parentNode) {
+                injectedPrep.parentNode.removeChild(injectedPrep);
+            }
+        }, 1000);
+    };
+
     applyTilePrefs();
     updateHomePreviews();
 });
 
-// Booklet export function
-window.exportMenuBooklet = () => {
-    const menuContainer = document.getElementById('menuDaysContainer');
-    const prepContainer = document.getElementById('prepContainer');
-    let injectedPrep = null;
-
-    if (menuContainer && prepContainer && prepContainer.innerHTML.trim() !== '') {
-        injectedPrep = document.createElement('div');
-        injectedPrep.className = 'accordion-item';
-        injectedPrep.innerHTML = `
-            <div class="accordion-header">
-                MEAL PREP
-            </div>
-            <div class="accordion-body">
-                ${prepContainer.innerHTML}
-            </div>
-        `;
-        menuContainer.appendChild(injectedPrep);
-    }
-
-    window.print();
-
-    setTimeout(() => {
-        if (injectedPrep && injectedPrep.parentNode) {
-            injectedPrep.parentNode.removeChild(injectedPrep);
-        }
-    }, 1000);
-};
