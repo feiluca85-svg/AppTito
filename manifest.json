@@ -1,6 +1,6 @@
 {
-  "name": "MetroMenu",
-  "short_name": "MetroMenu",
+  "name": "AppTito",
+  "short_name": "AppTito",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",

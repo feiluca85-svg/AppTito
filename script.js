@@ -67,6 +67,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const jsonInputArea = document.getElementById('jsonInputArea');
     const weekNameInput = document.getElementById('weekNameInput');
     const editModeBtn = document.getElementById('editModeBtn');
+    const headerTitle = document.getElementById('appHeaderTitle');
+
+    // --- GEM SHORTCUT LOGIC ---
+    let pressTimer;
+    const openGem = () => {
+        let gemUrl = localStorage.getItem('pasto_pronto_gem_url');
+        if (!gemUrl) {
+            gemUrl = prompt("Inserisci il link (URL) del tuo Gem su Google Gemini:", "https://gemini.google.com/");
+            if (gemUrl) {
+                localStorage.setItem('pasto_pronto_gem_url', gemUrl);
+            }
+        }
+        if (gemUrl) {
+            window.open(gemUrl, '_blank');
+        }
+    };
+
+    headerTitle.addEventListener('touchstart', (e) => {
+        pressTimer = setTimeout(openGem, 800);
+    });
+    headerTitle.addEventListener('touchend', () => clearTimeout(pressTimer));
+    headerTitle.addEventListener('touchcancel', () => clearTimeout(pressTimer));
+    headerTitle.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        openGem();
+    });
 
     let editMode = false;
     const metroColors = ['#a20025', '#f0a30a', '#00a300', '#2b5797', '#d3a300', '#881798', '#E3008C', '#008272', '#00aba9', '#6a00ff'];
@@ -105,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         viewToShow.style.display = viewToShow.id === 'homeView' ? 'grid' : 'block';
         
         // Update header logic
-        const headerTitle = document.getElementById('appHeaderTitle');
         if (viewToShow.id === 'homeView') {
             goHomeBtn.style.display = 'none';
             openSidebarBtn.style.display = 'inline-block';
