@@ -534,9 +534,9 @@ select.metro-input:focus {
     /* Menu Accordion overrides */
     #menuDaysContainer {
         display: grid;
-        grid-template-columns: 138mm 138mm; /* Controlla larghezza per dare più spazio al centro */
+        grid-template-columns: 140mm 140mm; /* Aumentato leggermente la larghezza per bilanciare il nuovo margine */
         justify-content: space-between; /* Spinge verso i bordi esterni */
-        padding: 0 3mm; /* 3mm dai bordi esterni del foglio A4 */
+        padding: 0 1.5mm; /* 1.5mm dai bordi esterni del foglio A4 */
         width: 100%;
         box-sizing: border-box;
         margin: 0;
