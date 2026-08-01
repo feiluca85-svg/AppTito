@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             html += `
                 <label style="display: flex; align-items: center; gap: 15px; cursor: pointer; ${style}">
-                    <input type="checkbox" data-index="${index}" class="grocery-checkbox" ${checked} style="width: 25px; height: 25px;">
+                    <input type="checkbox" data-index="${index}" class="grocery-checkbox" ${checked} style="width: 25px; height: 25px; flex-shrink: 0;">
                     <span>${item.item} (${item.estimatedPrice}€) ${voucherBadge}</span>
                 </label>
             `;
@@ -454,29 +454,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const giorni = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
-        giorni.forEach(giorno => {
-            if (activeData.menu[giorno]) {
-                const dayData = activeData.menu[giorno];
-                const prepTime = activeData.prepTimes?.[giorno] || '';
-                
-                const tile = document.createElement('div');
-                tile.className = 'metro-tile tile-wide';
-                tile.style.background = '#2b5797'; 
-                
-                tile.innerHTML = `
-                    <div class="tile-title" style="text-transform: capitalize; font-size: 1.5rem;">${giorno}</div>
-                    <div class="tile-content" style="margin-top: 15px; font-size: 1rem; display: flex; flex-direction: column; gap: 8px;">
-                        ${prepTime ? `<div style="color: #ffcc00; font-weight: bold; margin-bottom: 5px;"><i class="fa-solid fa-stopwatch"></i> Prep: ${prepTime}</div>` : ''}
-                        <div><strong>Colazione:</strong> ${dayData.breakfast || '-'}</div>
-                        ${dayData.snack1 ? `<div><strong>Spuntino:</strong> ${dayData.snack1}</div>` : ''}
-                        <div><strong>Pranzo:</strong> ${dayData.lunch || '-'}</div>
-                        ${dayData.snack2 ? `<div><strong>Merenda:</strong> ${dayData.snack2}</div>` : ''}
-                        <div><strong>Cena:</strong> ${dayData.dinner || '-'}</div>
-                    </div>
-                `;
-                container.appendChild(tile);
-            }
+        Object.entries(activeData.menu).forEach(([giorno, dayData]) => {
+            const prepKey = activeData.prepTimes ? Object.keys(activeData.prepTimes).find(k => k.toLowerCase() === giorno.toLowerCase()) : null;
+            const prepTime = prepKey ? activeData.prepTimes[prepKey] : '';
+            
+            const tile = document.createElement('div');
+            tile.className = 'metro-tile tile-wide';
+            tile.style.background = '#2b5797'; 
+            
+            tile.innerHTML = `
+                <div class="tile-title" style="text-transform: capitalize; font-size: 1.5rem;">${giorno}</div>
+                <div class="tile-content" style="margin-top: 15px; font-size: 1rem; display: flex; flex-direction: column; gap: 8px;">
+                    ${prepTime ? `<div style="color: #ffcc00; font-weight: bold; margin-bottom: 5px;"><i class="fa-solid fa-stopwatch"></i> Prep: ${prepTime}</div>` : ''}
+                    <div><strong>Colazione:</strong> ${dayData.breakfast || '-'}</div>
+                    ${dayData.snack1 ? `<div><strong>Spuntino:</strong> ${dayData.snack1}</div>` : ''}
+                    <div><strong>Pranzo:</strong> ${dayData.lunch || '-'}</div>
+                    ${dayData.snack2 ? `<div><strong>Merenda:</strong> ${dayData.snack2}</div>` : ''}
+                    <div><strong>Cena:</strong> ${dayData.dinner || '-'}</div>
+                </div>
+            `;
+            container.appendChild(tile);
         });
     };
 
