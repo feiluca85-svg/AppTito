@@ -610,3 +610,17 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTilePrefs();
     updateHomePreviews();
 });
+
+// Booklet export function
+window.exportMenuBooklet = () => {
+    const prepView = document.getElementById('prepView');
+    if (prepView) {
+        prepView.classList.add('force-print');
+    }
+    window.print();
+    setTimeout(() => {
+        if (prepView) {
+            prepView.classList.remove('force-print');
+        }
+    }, 1000);
+};

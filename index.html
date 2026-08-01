@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=33">
+    <link rel="stylesheet" href="style.css?v=34">
     
     <!-- PWA meta tags -->
     <link rel="manifest" href="manifest.json">
@@ -118,7 +118,7 @@
         <div id="menuView" class="detail-view" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="font-weight: 300; margin: 0;">Menu Settimanale</h2>
-                <button class="metro-icon-btn" onclick="window.print()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                <button class="metro-icon-btn" onclick="exportMenuBooklet()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
             </div>
             <div id="menuDaysContainer"></div>
         </div>
@@ -180,6 +180,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=33"></script>
+    <script src="script.js?v=34"></script>
 </body>
 </html>
