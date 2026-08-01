@@ -90,14 +90,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetGemBtn = document.getElementById('resetGemBtn');
     if (resetGemBtn) {
         resetGemBtn.addEventListener('click', () => {
-            let newUrl = prompt("Inserisci il NUOVO link (URL) del tuo Gem:", localStorage.getItem('pasto_pronto_gem_url') || "https://gemini.google.com/");
-            if (newUrl) {
-                if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
-                    newUrl = 'https://' + newUrl;
+            closeSidebar();
+            setTimeout(() => {
+                let newUrl = prompt("Inserisci il NUOVO link (URL) del tuo Gem:", localStorage.getItem('pasto_pronto_gem_url') || "https://gemini.google.com/");
+                if (newUrl) {
+                    if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+                        newUrl = 'https://' + newUrl;
+                    }
+                    localStorage.setItem('pasto_pronto_gem_url', newUrl);
+                    alert("Link aggiornato con successo!");
                 }
-                localStorage.setItem('pasto_pronto_gem_url', newUrl);
-                alert("Link aggiornato con successo!");
-            }
+            }, 300);
         });
     }
 
@@ -264,17 +267,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- IMPORT LOGIC ---
     openImportBtn.addEventListener('click', () => {
-        jsonInputArea.value = '';
-        
-        // Proponi il nome della settimana (es. 2026-08-01)
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        // Approssimazione settimana del mese
-        const weekOfMonth = Math.ceil(now.getDate() / 7);
-        weekNameInput.value = `${year}-${month}-0${weekOfMonth}`;
-        
-        importModal.classList.add('active');
+        closeSidebar();
+        setTimeout(() => {
+            jsonInputArea.value = '';
+            
+            // Proponi il nome della settimana (es. 2026-08-01)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            // Approssimazione settimana del mese
+            const weekOfMonth = Math.ceil(now.getDate() / 7);
+            weekNameInput.value = `${year}-${month}-0${weekOfMonth}`;
+            
+            importModal.classList.add('active');
+        }, 300);
     });
 
     closeImportBtn.addEventListener('click', () => {
