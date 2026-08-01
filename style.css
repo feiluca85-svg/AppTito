@@ -522,13 +522,11 @@ select.metro-input:focus {
 
     /* Menu Accordion overrides */
     #menuDaysContainer {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        justify-content: center;
-        column-gap: 15mm;
-        row-gap: 15mm;
-        margin: 0;
-        padding: 5mm; /* Ridotto per dare ancora più spazio verticale */
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 auto;
+        padding: 0;
+        width: 297mm;
     }
     .accordion-item {
         background: white !important;
@@ -536,13 +534,25 @@ select.metro-input:focus {
         border: 2px solid #000 !important;
         page-break-inside: avoid;
         break-inside: avoid;
-        height: 195mm; /* Sfrutta tutta l'altezza A5 disponibile considerando 5mm di padding */
+        width: calc(148.5mm - 10mm);
+        height: 198mm;
         overflow: hidden;
-        margin: 0 !important;
+        margin: 5mm !important;
         display: flex;
         flex-direction: column;
         border-radius: 8px;
+        box-sizing: border-box;
     }
+    
+    /* Booklet ordering */
+    .accordion-item:nth-child(1) { order: 2; } /* Lunedì */
+    .accordion-item:nth-child(2) { order: 3; } /* Martedì */
+    .accordion-item:nth-child(3) { order: 6; } /* Mercoledì */
+    .accordion-item:nth-child(4) { order: 7; } /* Giovedì */
+    .accordion-item:nth-child(5) { order: 8; } /* Venerdì */
+    .accordion-item:nth-child(6) { order: 5; } /* Sabato */
+    .accordion-item:nth-child(7) { order: 4; } /* Domenica */
+    .accordion-item:nth-child(8) { order: 1; } /* Meal Prep */
     .accordion-header {
         background: #f0f0f0 !important;
         color: black !important;
