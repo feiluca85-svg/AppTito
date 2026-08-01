@@ -700,14 +700,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Booklet export function
 window.exportMenuBooklet = () => {
-    const prepView = document.getElementById('prepView');
-    if (prepView) {
-        prepView.classList.add('force-print');
+    const menuContainer = document.getElementById('menuDaysContainer');
+    const prepContainer = document.getElementById('prepContainer');
+    let injectedPrep = null;
+
+    if (menuContainer && prepContainer && prepContainer.innerHTML.trim() !== '') {
+        injectedPrep = document.createElement('div');
+        injectedPrep.className = 'accordion-item';
+        injectedPrep.innerHTML = `
+            <div class="accordion-header">
+                MEAL PREP
+            </div>
+            <div class="accordion-body">
+                ${prepContainer.innerHTML}
+            </div>
+        `;
+        menuContainer.appendChild(injectedPrep);
     }
+
     window.print();
+
     setTimeout(() => {
-        if (prepView) {
-            prepView.classList.remove('force-print');
+        if (injectedPrep && injectedPrep.parentNode) {
+            injectedPrep.parentNode.removeChild(injectedPrep);
         }
     }, 1000);
 };

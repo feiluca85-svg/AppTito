@@ -493,7 +493,7 @@ select.metro-input:focus {
         size: A4 landscape;
         margin: 0mm; /* Rimuove intestazioni e piè di pagina del browser */
     }
-    body { background: white; color: black; font-size: 9pt; line-height: 1.2; }
+    body { background: white; color: black; font-size: 8pt; line-height: 1.15; }
     .pivot-header, .modal-overlay, #homeView { display: none !important; }
     
     /* Nascondi il titolo h2 e i bottoni */
@@ -524,10 +524,11 @@ select.metro-input:focus {
     #menuDaysContainer {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        justify-content: center;
         column-gap: 15mm;
         row-gap: 15mm;
         margin: 0;
-        padding: 10mm; /* Margine di sicurezza dal bordo pagina */
+        padding: 5mm; /* Ridotto per dare ancora più spazio verticale */
     }
     .accordion-item {
         background: white !important;
@@ -535,7 +536,7 @@ select.metro-input:focus {
         border: 2px solid #000 !important;
         page-break-inside: avoid;
         break-inside: avoid;
-        height: 185mm; /* Sfrutta tutta l'altezza A5 disponibile */
+        height: 195mm; /* Sfrutta tutta l'altezza A5 disponibile considerando 5mm di padding */
         overflow: hidden;
         margin: 0 !important;
         display: flex;
