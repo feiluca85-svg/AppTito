@@ -1,31 +1,67 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyC12o-f0D7yEUGb6LdQQK2KthGp10pMR2w",
+  authDomain: "apptito-44c72.firebaseapp.com",
+  projectId: "apptito-44c72",
+  storageBucket: "apptito-44c72.firebasestorage.app",
+  messagingSenderId: "730853120876",
+  appId: "1:730853120876:web:3c582359cf0f18ed563149"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const docRef = db.collection("pasto_pronto").doc("family_state");
+
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- STATE ---
     let weeksData = {};
     let activeWeekId = null;
-    
     let budgetCash = 100.0;
     let budgetVouchers = 90.0;
     
-    // --- LOAD STATE ---
-    try {
-        weeksData = JSON.parse(localStorage.getItem('pasto_pronto_weeks') || '{}');
-        activeWeekId = localStorage.getItem('pasto_pronto_active_week') || null;
-        
-        // Se non c'è una settimana attiva ma ci sono settimane salvate, prendi la prima
-        if (!activeWeekId && Object.keys(weeksData).length > 0) {
-            activeWeekId = Object.keys(weeksData)[0];
-        }
+    // --- FIREBASE SYNC ---
+    let isDbLoaded = false;
+    docRef.onSnapshot((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            weeksData = data.weeksData || {};
+            activeWeekId = data.activeWeekId || null;
+            
+            if (!activeWeekId && Object.keys(weeksData).length > 0) {
+                activeWeekId = Object.keys(weeksData)[0];
+            }
+            
+            budgetCash = data.budgetCash !== undefined ? data.budgetCash : 100.00;
+            budgetVouchers = data.budgetVouchers !== undefined ? data.budgetVouchers : 90.00;
+            
+            // Backup locale
+            localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
+            if (activeWeekId) localStorage.setItem('pasto_pronto_active_week', activeWeekId);
+            localStorage.setItem('pasto_pronto_cash', budgetCash.toString());
+            localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
 
-        const storedCash = localStorage.getItem('pasto_pronto_cash');
-        if (storedCash !== null) budgetCash = parseFloat(storedCash);
-        
-        const storedVouchers = localStorage.getItem('pasto_pronto_vouchers');
-        if (storedVouchers !== null) budgetVouchers = parseFloat(storedVouchers);
-        
-    } catch(e) {
-        console.error("Error loading state", e);
-    }
+            isDbLoaded = true;
+            
+            // Aggiorna le viste attive
+            updateHomePreviews();
+            if (typeof reRenderActiveView === 'function') reRenderActiveView();
+        } else if (!isDbLoaded) {
+            // Migrazione iniziale dal telefono al Cloud
+            try {
+                weeksData = JSON.parse(localStorage.getItem('pasto_pronto_weeks') || '{}');
+                activeWeekId = localStorage.getItem('pasto_pronto_active_week') || null;
+                if (!activeWeekId && Object.keys(weeksData).length > 0) activeWeekId = Object.keys(weeksData)[0];
+                const storedCash = localStorage.getItem('pasto_pronto_cash');
+                if (storedCash !== null) budgetCash = parseFloat(storedCash);
+                const storedVouchers = localStorage.getItem('pasto_pronto_vouchers');
+                if (storedVouchers !== null) budgetVouchers = parseFloat(storedVouchers);
+            } catch(e) {}
+            
+            saveState(); // Salva sul Cloud per la prima volta
+            isDbLoaded = true;
+        }
+    }, (error) => {
+        console.error("Errore di sincronizzazione:", error);
+    });
 
     // Auto-recharge vouchers on the 6th of each month
     const checkVoucherRecharge = () => {
@@ -35,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (today.getDate() >= 6 && lastRechargeMonth !== currentMonthKey) {
             budgetVouchers = 90.0;
-            localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
+            saveState();
             localStorage.setItem('lastVoucherRechargeMonth', currentMonthKey);
             alert("Oggi è passato il 6 del mese! Il budget dei Buoni Celiachia è stato ripristinato automaticamente a 90.00 €.");
         }
@@ -43,6 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
     checkVoucherRecharge();
 
     const saveState = () => {
+        docRef.set({
+            weeksData: weeksData,
+            activeWeekId: activeWeekId,
+            budgetCash: budgetCash,
+            budgetVouchers: budgetVouchers
+        }, { merge: true }).catch(err => console.error("Errore salvataggio Cloud:", err));
+        
+        // Backup locale
         localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
         if (activeWeekId) localStorage.setItem('pasto_pronto_active_week', activeWeekId);
         localStorage.setItem('pasto_pronto_cash', budgetCash.toString());
@@ -164,7 +208,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- NAVIGATION LOGIC ---
-    const showView = (viewToShow, title) => {
+    let currentActiveRenderFn = null;
+    let currentActiveView = null;
+    let currentActiveTitle = "";
+
+    window.reRenderActiveView = () => {
+        if (currentActiveRenderFn && currentActiveView && currentActiveView.style.display !== 'none') {
+            currentActiveRenderFn();
+        }
+    };
+
+    const showView = (viewToShow, title, renderFn) => {
+        currentActiveView = viewToShow;
+        currentActiveTitle = title;
+        currentActiveRenderFn = renderFn;
+
         // Nascondi tutte le viste principali
         views.forEach(v => v.style.display = 'none');
         // Mostra la vista richiesta
@@ -192,14 +250,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    goHomeBtn.addEventListener('click', () => showView(homeView));
+    goHomeBtn.addEventListener('click', () => {
+        showView(homeView, "AppTito", null);
+        updateHomePreviews();
+    });
     
     const handleTileClick = (e, tile, view, title, renderFn) => {
         if (editMode) {
             e.preventDefault();
             // Change color
-            let currentColor = tile.dataset.color;
-            let nextIndex = (metroColors.indexOf(currentColor) + 1) % metroColors.length;
+            let currentIndex = metroColors.indexOf(tile.dataset.color);
+            let nextIndex = (currentIndex + 1) % metroColors.length;
             tile.style.background = metroColors[nextIndex];
             tile.dataset.color = metroColors[nextIndex];
             
@@ -207,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tilePrefs[tile.id].color = metroColors[nextIndex];
             saveTilePrefs();
         } else {
-            showView(view, title); 
+            showView(view, title, renderFn); 
             renderFn();
         }
     };
@@ -609,37 +670,31 @@ document.addEventListener('DOMContentLoaded', () => {
     attachTileEvents(tilePrep, prepView, "meal prep", renderPrep);
 
     // Init
-    applyTilePrefs();
-    updateHomePreviews();
-});
+    window.addCustomGroceryItem = () => {
+        const input = document.getElementById('customGroceryInput');
+        const itemName = input.value.trim();
+        if (!itemName) return;
 
-// Add custom grocery item
-window.addCustomGroceryItem = () => {
-    const input = document.getElementById('customGroceryInput');
-    const itemName = input.value.trim();
-    if (!itemName) return;
-
-    try {
-        const weeksDataObj = JSON.parse(localStorage.getItem('pasto_pronto_weeks') || '{}');
-        const activeWeekId = localStorage.getItem('pasto_pronto_active_week') || null;
-        
-        if (activeWeekId && weeksDataObj[activeWeekId]) {
-            weeksDataObj[activeWeekId].groceryList.push({
+        if (activeWeekId && weeksData[activeWeekId]) {
+            weeksData[activeWeekId].groceryList.push({
                 item: itemName,
                 category: "Aggiunti a Mano",
                 estimatedPrice: 0,
                 useVoucher: false,
                 checked: false
             });
-            localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksDataObj));
+            saveState();
             input.value = '';
-            // Ricarica la pagina per renderizzare di nuovo o trigghera un evento
-            location.reload(); 
+            // Since saveState syncs to Firebase, Firebase listener will trigger reRenderActiveView automatically!
+            // But just in case, we force render here.
+            renderGrocery();
         }
-    } catch(e) {
-        console.error(e);
-    }
-};
+    };
+
+    // Load initial views
+    applyTilePrefs();
+    updateHomePreviews();
+});
 
 // Booklet export function
 window.exportMenuBooklet = () => {
