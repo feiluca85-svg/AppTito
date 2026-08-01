@@ -181,11 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let tilePrefs = {};
     try {
         tilePrefs = JSON.parse(localStorage.getItem('pasto_pronto_tiles') || '{}');
-        // Forza il reset del colore del tileMenu per applicare il Cobalt Blue richiesto
-        if (tilePrefs['tileMenu'] && tilePrefs['tileMenu'].color !== '#0050ef') {
-            delete tilePrefs['tileMenu'].color;
-            localStorage.setItem('pasto_pronto_tiles', JSON.stringify(tilePrefs));
-        }
     } catch(e){}
 
     const saveTilePrefs = () => {
