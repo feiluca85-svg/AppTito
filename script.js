@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- NAVIGATION LOGIC ---
     const showView = (viewToShow, title) => {
-        // Nascondi tutte le viste
-        document.querySelectorAll('.metro-grid, .detail-view').forEach(el => el.style.display = 'none');
+        // Nascondi tutte le viste principali
+        views.forEach(v => v.style.display = 'none');
         // Mostra la vista richiesta
         viewToShow.style.display = viewToShow.id === 'homeView' ? 'grid' : 'block';
         
