@@ -545,10 +545,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             accordionItem.innerHTML = `
                 <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
-                    <span>${giorno} ${prepTime ? `<span style="font-size:0.9rem; color:#ccc; margin-left: 10px; text-transform:none;"><i class="fa-solid fa-stopwatch"></i> ${prepTime}</span>` : ''}</span>
+                    <span>${giorno}</span>
                     <i class="fa-solid fa-chevron-down chevron"></i>
                 </div>
                 <div class="accordion-body">
+                    ${prepTime ? `<div style="padding: 10px; background: #333; margin-bottom: 15px; border-radius: 4px;"><i class="fa-solid fa-stopwatch"></i> <strong>Tempi:</strong> ${prepTime}</div>` : ''}
                     <div class="menu-meal-block">
                         <div class="menu-meal-title">Colazione & Spuntino</div>
                         <div class="menu-meal-content"><strong>Colazione:</strong><br>${bfast}${s1}</div>
