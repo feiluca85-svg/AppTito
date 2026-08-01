@@ -491,13 +491,16 @@ select.metro-input:focus {
 @media print {
     @page {
         size: A4 landscape;
-        margin: 10mm;
+        margin: 0mm; /* Rimuove intestazioni e piè di pagina del browser */
     }
-    body { background: white; color: black; font-size: 10pt; line-height: 1.3; }
+    body { background: white; color: black; font-size: 9pt; line-height: 1.2; }
     .pivot-header, .modal-overlay, #homeView { display: none !important; }
+    
+    /* Nascondi il titolo h2 e i bottoni */
+    #menuView h2, .metro-btn, .metro-icon-btn, input, .fa-solid { display: none !important; }
+    
     .detail-view { box-shadow: none; animation: none; padding: 0 !important; }
     .detail-view.force-print { display: block !important; page-break-before: always; }
-    .metro-btn, .metro-icon-btn, input, .fa-solid { display: none !important; }
     .metro-tile { border: 1px solid #ccc; break-inside: avoid; background: white !important; color: black !important; }
     .tile-title { color: black; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; }
     
@@ -524,7 +527,7 @@ select.metro-input:focus {
         column-gap: 15mm;
         row-gap: 15mm;
         margin: 0;
-        padding: 0;
+        padding: 10mm; /* Margine di sicurezza dal bordo pagina */
     }
     .accordion-item {
         background: white !important;
@@ -532,7 +535,7 @@ select.metro-input:focus {
         border: 2px solid #000 !important;
         page-break-inside: avoid;
         break-inside: avoid;
-        height: 175mm; /* Forza l'altezza A5 (210mm - margini A4) */
+        height: 185mm; /* Sfrutta tutta l'altezza A5 disponibile */
         overflow: hidden;
         margin: 0 !important;
         display: flex;
@@ -543,8 +546,8 @@ select.metro-input:focus {
         background: #f0f0f0 !important;
         color: black !important;
         border-bottom: 2px solid #000 !important;
-        padding: 10px !important;
-        font-size: 16pt !important;
+        padding: 6px !important;
+        font-size: 14pt !important;
         font-weight: bold;
         text-align: center;
         text-transform: uppercase;
@@ -554,14 +557,14 @@ select.metro-input:focus {
     }
     .accordion-body {
         max-height: none !important;
-        padding: 15px !important;
+        padding: 8px !important;
         background: white !important;
         color: black !important;
         overflow: visible !important;
         flex: 1;
     }
     .menu-meal-block {
-        margin-bottom: 8px !important;
+        margin-bottom: 5px !important;
         padding-bottom: 8px !important;
         page-break-inside: avoid;
     }
