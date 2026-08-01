@@ -76,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!gemUrl) {
             gemUrl = prompt("Inserisci il link (URL) del tuo Gem su Google Gemini:", "https://gemini.google.com/");
             if (gemUrl) {
+                if (!gemUrl.startsWith('http://') && !gemUrl.startsWith('https://')) {
+                    gemUrl = 'https://' + gemUrl;
+                }
                 localStorage.setItem('pasto_pronto_gem_url', gemUrl);
             }
         }
@@ -83,6 +86,20 @@ document.addEventListener('DOMContentLoaded', () => {
             window.open(gemUrl, '_blank');
         }
     };
+
+    const resetGemBtn = document.getElementById('resetGemBtn');
+    if (resetGemBtn) {
+        resetGemBtn.addEventListener('click', () => {
+            let newUrl = prompt("Inserisci il NUOVO link (URL) del tuo Gem:", localStorage.getItem('pasto_pronto_gem_url') || "https://gemini.google.com/");
+            if (newUrl) {
+                if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+                    newUrl = 'https://' + newUrl;
+                }
+                localStorage.setItem('pasto_pronto_gem_url', newUrl);
+                alert("Link aggiornato con successo!");
+            }
+        });
+    }
 
     headerTitle.addEventListener('touchstart', (e) => {
         pressTimer = setTimeout(openGem, 800);
