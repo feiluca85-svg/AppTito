@@ -583,3 +583,21 @@ select.metro-input:focus {
     border-left: 4px solid white;
     border-radius: 4px;
 }
+
+/* STRUCTURED OBJECT STYLES */
+.meal-detail-item {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+    border-left: 2px solid var(--accent);
+}
+.meal-detail-key {
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-bottom: 4px;
+    color: #fff;
+}
+.meal-detail-value {
+    color: var(--text-secondary);
+}

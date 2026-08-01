@@ -512,9 +512,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const safeStringify = (data) => {
         if (!data) return '-';
         if (typeof data === 'string') return data.replace(/\n/g, '<br>');
-        if (Array.isArray(data)) return data.map(safeStringify).join('<br><br>');
+        if (Array.isArray(data)) return data.map(safeStringify).join('<div style="margin-top:8px;"></div>');
         if (typeof data === 'object') {
-            return Object.entries(data).map(([k, v]) => `<strong>${k}:</strong><br>${safeStringify(v)}`).join('<br><br>');
+            return Object.entries(data).map(([k, v]) => 
+                `<div class="meal-detail-item">
+                    <div class="meal-detail-key">${k}</div>
+                    <div class="meal-detail-value">${safeStringify(v)}</div>
+                </div>`
+            ).join('');
         }
         return String(data).replace(/\n/g, '<br>');
     };
