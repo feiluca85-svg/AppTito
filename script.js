@@ -388,25 +388,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Budget & Vouchers
         document.getElementById('budgetHomePreview').textContent = `${budgetCash.toFixed(2)} €`;
         document.getElementById('vouchersHomePreview').textContent = `${budgetVouchers.toFixed(2)} €`;
-
-        const activeData = activeWeekId ? weeksData[activeWeekId] : null;
-
-        if (activeData) {
-            // Grocery
-            const totItems = activeData.groceryList.length;
-            const checkedItems = activeData.groceryList.filter(i => i.checked).length;
-            document.getElementById('groceryHomePreview').textContent = `${checkedItems} / ${totItems} completati`;
-
-            // Menu
-            document.getElementById('tileMenu').querySelector('.tile-content').textContent = `Settimana attiva: ${activeWeekId}`;
-
-            // Prep
-            document.getElementById('prepHomePreview').textContent = activeData.mealPrep || 'Nessun meal prep';
-        } else {
-            document.getElementById('groceryHomePreview').textContent = 'Nessun menu caricato';
-            document.getElementById('tileMenu').querySelector('.tile-content').textContent = 'Nessun menu caricato';
-            document.getElementById('prepHomePreview').textContent = 'Nessun menu caricato';
-        }
     };
 
     // Budget Tracker Logic

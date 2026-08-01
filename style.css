@@ -471,7 +471,7 @@ select.metro-input:focus {
     right: -15px;
     font-size: 8rem;
     color: #000;
-    opacity: 0.2;
+    opacity: 1;
     z-index: 1;
     transform: rotate(-15deg);
 }
