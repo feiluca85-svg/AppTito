@@ -703,11 +703,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const menuContainer = document.getElementById('menuDaysContainer');
         const prepContainer = document.getElementById('prepContainer');
-        let injectedPrep = null;
 
         if (menuContainer && prepContainer && prepContainer.innerHTML.trim() !== '') {
-            injectedPrep = document.createElement('div');
-            injectedPrep.className = 'accordion-item';
+            // Rimuovi eventuali duplicati se esportiamo più volte
+            const existing = document.getElementById('printPrepInjected');
+            if (existing) {
+                existing.remove();
+            }
+
+            const injectedPrep = document.createElement('div');
+            injectedPrep.id = 'printPrepInjected';
+            injectedPrep.className = 'accordion-item print-only-prep'; // Nascosto su schermo, visibile in stampa
             injectedPrep.innerHTML = `
                 <div class="accordion-header">
                     MEAL PREP
@@ -719,13 +725,10 @@ document.addEventListener('DOMContentLoaded', () => {
             menuContainer.appendChild(injectedPrep);
         }
 
+        // Il comando di stampa sui cellulari può richiedere tempo o essere asincrono. 
+        // Lasciamo l'elemento nel DOM nascosto invece di rimuoverlo con un timeout,
+        // così non rischiamo che venga distrutto prima che il PDF sia generato.
         window.print();
-
-        setTimeout(() => {
-            if (injectedPrep && injectedPrep.parentNode) {
-                injectedPrep.parentNode.removeChild(injectedPrep);
-            }
-        }, 1000);
     };
 
     applyTilePrefs();
