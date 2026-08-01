@@ -519,27 +519,46 @@ select.metro-input:focus {
 
     /* Menu Accordion overrides */
     #menuDaysContainer {
-        column-count: 2;
-        column-gap: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 15mm;
+        row-gap: 15mm;
+        margin: 0;
+        padding: 0;
     }
-    .accordion-item, .accordion-header {
+    .accordion-item {
         background: white !important;
         color: black !important;
-        border-color: #ccc !important;
+        border: 2px solid #000 !important;
         page-break-inside: avoid;
-        margin-bottom: 5px !important;
+        break-inside: avoid;
+        height: 175mm; /* Forza l'altezza A5 (210mm - margini A4) */
+        overflow: hidden;
+        margin: 0 !important;
+        display: flex;
+        flex-direction: column;
+        border-radius: 8px;
     }
     .accordion-header {
-        padding: 8px 10px !important;
-        border-bottom: 1px solid #ccc !important;
-        font-size: 12pt !important;
+        background: #f0f0f0 !important;
+        color: black !important;
+        border-bottom: 2px solid #000 !important;
+        padding: 10px !important;
+        font-size: 16pt !important;
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    .accordion-header .chevron {
+        display: none !important;
     }
     .accordion-body {
         max-height: none !important;
-        padding: 10px !important;
+        padding: 15px !important;
         background: white !important;
         color: black !important;
         overflow: visible !important;
+        flex: 1;
     }
     .menu-meal-block {
         margin-bottom: 8px !important;
