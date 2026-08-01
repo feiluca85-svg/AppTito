@@ -503,6 +503,9 @@ select.metro-input:focus {
     /* Nascondi il titolo h2 e i bottoni */
     #menuView h2, .metro-btn, .metro-icon-btn, input, .fa-solid { display: none !important; }
     
+    /* Nascondi i contenitori delle intestazioni per rimuovere il margin-bottom che crea la prima pagina bianca */
+    .detail-view > div:first-child { display: none !important; }
+    
     .detail-view { box-shadow: none; animation: none; padding: 0 !important; }
     .detail-view.force-print { display: block !important; page-break-before: always; }
     .metro-tile { border: 1px solid #ccc; break-inside: avoid; background: white !important; color: black !important; }
