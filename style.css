@@ -493,7 +493,11 @@ select.metro-input:focus {
         size: A4 landscape;
         margin: 0mm; /* Rimuove intestazioni e piè di pagina del browser */
     }
-    body { background: white; color: black; font-size: 8pt; line-height: 1.15; }
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white; color: black; font-size: 8pt; line-height: 1.15;
+    }
     .pivot-header, .modal-overlay, #homeView { display: none !important; }
     
     /* Nascondi il titolo h2 e i bottoni */
