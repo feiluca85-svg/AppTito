@@ -534,10 +534,12 @@ select.metro-input:focus {
     /* Menu Accordion overrides */
     #menuDaysContainer {
         display: grid;
-        grid-template-columns: 50% 50%;
-        margin: 0 auto;
-        padding: 0;
+        grid-template-columns: 138mm 138mm; /* Controlla larghezza per dare più spazio al centro */
+        justify-content: space-between; /* Spinge verso i bordi esterni */
+        padding: 0 3mm; /* 3mm dai bordi esterni del foglio A4 */
         width: 100%;
+        box-sizing: border-box;
+        margin: 0;
     }
     .accordion-item {
         background: white !important;
@@ -545,9 +547,10 @@ select.metro-input:focus {
         border: 2px solid #000 !important;
         page-break-inside: avoid;
         break-inside: avoid;
-        height: 202mm; /* Aumentato per dare ancora più spazio verticale */
+        height: 198mm; /* Ritoccato per migliore centratura verticale */
+        width: 100%;
         overflow: hidden;
-        margin: 3mm 5mm !important; /* Margini simmetrici per centratura matematica in ogni metà A4 */
+        margin: 5mm 0 !important; /* Margine superiore e inferiore di 5mm, totale 208mm per non sforare i 210mm */
         display: flex;
         flex-direction: column;
         border-radius: 8px;
