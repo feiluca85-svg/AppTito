@@ -266,25 +266,30 @@ document.addEventListener('DOMContentLoaded', () => {
             delBtn.style.border = 'none';
             delBtn.style.color = '#ff4d4d';
             delBtn.style.cursor = 'pointer';
-            delBtn.style.fontSize = '1.1rem';
-            delBtn.style.padding = '5px';
+            delBtn.style.fontSize = '1.2rem';
+            delBtn.style.padding = '15px'; // Touch target più grande
+            delBtn.style.margin = '-10px'; // Compensa il padding
+            delBtn.style.minWidth = '44px';
+            delBtn.style.minHeight = '44px';
 
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation(); // Previene il click sul div padre
-                if (confirm(`Vuoi davvero eliminare la settimana "${key}"?`)) {
-                    delete weeksData[key];
-                    if (activeWeekId === key) {
-                        const remaining = Object.keys(weeksData).sort().reverse();
-                        activeWeekId = remaining.length > 0 ? remaining[0] : null;
+                setTimeout(() => {
+                    if (confirm(`Vuoi davvero eliminare la settimana "${key}"?`)) {
+                        delete weeksData[key];
+                        if (activeWeekId === key) {
+                            const remaining = Object.keys(weeksData).sort().reverse();
+                            activeWeekId = remaining.length > 0 ? remaining[0] : null;
+                        }
+                        saveState();
+                        renderSidebar();
+                        updateHomePreviews();
+                        // Se siamo su una view di dettaglio e cancelliamo quella attiva, torniamo alla home per evitare errori
+                        if (document.getElementById('homeView').style.display === 'none') {
+                            showView(document.getElementById('homeView'));
+                        }
                     }
-                    saveState();
-                    renderSidebar();
-                    updateHomePreviews();
-                    // Se siamo su una view di dettaglio e cancelliamo quella attiva, torniamo alla home per evitare errori
-                    if (document.getElementById('homeView').style.display === 'none') {
-                        showView(document.getElementById('homeView'));
-                    }
-                }
+                }, 10);
             });
 
             div.appendChild(textSpan);
