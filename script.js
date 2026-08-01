@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const activeData = activeWeekId ? weeksData[activeWeekId] : null;
         if (!activeData || !activeData.menu || Object.keys(activeData.menu).length === 0) {
-            container.innerHTML = '<div style="color:var(--text-secondary); grid-column: 1/-1;">Nessun menu per questa settimana.</div>';
+            container.innerHTML = '<div style="color:var(--text-secondary);">Nessun menu per questa settimana.</div>';
             return;
         }
 
@@ -523,22 +523,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const prepKey = activeData.prepTimes ? Object.keys(activeData.prepTimes).find(k => k.toLowerCase() === giorno.toLowerCase()) : null;
             const prepTime = prepKey ? activeData.prepTimes[prepKey] : '';
             
-            const tile = document.createElement('div');
-            tile.className = 'metro-tile tile-wide';
-            tile.style.background = '#2b5797'; 
+            const accordionItem = document.createElement('div');
+            accordionItem.className = 'accordion-item';
             
-            tile.innerHTML = `
-                <div class="tile-title" style="text-transform: capitalize; font-size: 1.5rem;">${giorno}</div>
-                <div class="tile-content" style="margin-top: 15px; font-size: 1rem; display: flex; flex-direction: column; gap: 8px;">
-                    ${prepTime ? `<div style="color: #ffcc00; font-weight: bold; margin-bottom: 5px;"><i class="fa-solid fa-stopwatch"></i> Prep: ${prepTime}</div>` : ''}
-                    <div><strong>Colazione:</strong> ${dayData.breakfast || '-'}</div>
-                    ${dayData.snack1 ? `<div><strong>Spuntino:</strong> ${dayData.snack1}</div>` : ''}
-                    <div><strong>Pranzo:</strong> ${dayData.lunch || '-'}</div>
-                    ${dayData.snack2 ? `<div><strong>Merenda:</strong> ${dayData.snack2}</div>` : ''}
-                    <div><strong>Cena:</strong> ${dayData.dinner || '-'}</div>
+            accordionItem.innerHTML = `
+                <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                    <span>${giorno} ${prepTime ? `<span style="font-size:0.9rem; color:#ccc; margin-left: 10px; text-transform:none;"><i class="fa-solid fa-stopwatch"></i> ${prepTime}</span>` : ''}</span>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
+                </div>
+                <div class="accordion-body">
+                    <div class="menu-meal-block">
+                        <div class="menu-meal-title">Colazione & Spuntino</div>
+                        <div class="menu-meal-content"><strong>Colazione:</strong> ${dayData.breakfast || '-'}
+${dayData.snack1 ? `<strong>Spuntino:</strong> ${dayData.snack1}` : ''}</div>
+                    </div>
+                    <div class="menu-meal-block">
+                        <div class="menu-meal-title">Pranzo & Merenda</div>
+                        <div class="menu-meal-content"><strong>Pranzo:</strong>
+${dayData.lunch || '-'}
+
+${dayData.snack2 ? `<strong>Merenda:</strong> ${dayData.snack2}` : ''}</div>
+                    </div>
+                    <div class="menu-meal-block">
+                        <div class="menu-meal-title">Cena</div>
+                        <div class="menu-meal-content">${dayData.dinner || '-'}</div>
+                    </div>
                 </div>
             `;
-            container.appendChild(tile);
+            container.appendChild(accordionItem);
         });
     };
 
@@ -547,10 +559,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('prepContainer');
         const activeData = activeWeekId ? weeksData[activeWeekId] : null;
         
-        if (!activeData || !activeData.mealPrep) {
+        if (!activeData || !activeData.mealPrep || activeData.mealPrep.length === 0) {
             container.textContent = "Nessun meal prep trovato per questa settimana.";
         } else {
-            container.innerHTML = activeData.mealPrep.replace(/\n/g, '<br>');
+            container.innerHTML = '';
+            if (Array.isArray(activeData.mealPrep)) {
+                activeData.mealPrep.forEach(step => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'prep-step';
+                    stepDiv.innerHTML = step.replace(/\n/g, '<br>');
+                    container.appendChild(stepDiv);
+                });
+            } else {
+                container.innerHTML = activeData.mealPrep.replace(/\n/g, '<br>');
+            }
         }
     };
 

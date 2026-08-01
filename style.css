@@ -498,3 +498,88 @@ select.metro-input:focus {
     .grocery-checkbox { display: none !important; }
     #groceryListContainer label { text-decoration: none !important; opacity: 1 !important; margin-bottom: 5px; }
 }
+
+/* ACCORDION MENU STYLES */
+.accordion-item {
+    background: #222;
+    border: 1px solid #444;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.accordion-header {
+    background: #333;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-primary);
+    transition: background 0.2s ease;
+    text-transform: capitalize;
+}
+
+.accordion-header:hover {
+    background: #444;
+}
+
+.accordion-header .chevron {
+    transition: transform 0.3s ease;
+}
+
+.accordion-item.open .accordion-header .chevron {
+    transform: rotate(180deg);
+}
+
+.accordion-item.open .accordion-header {
+    background: var(--accent);
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    background: #1a1a1a;
+    padding: 0 20px;
+}
+
+.accordion-item.open .accordion-body {
+    max-height: 2000px;
+    padding: 20px;
+}
+
+.menu-meal-block {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+}
+.menu-meal-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.menu-meal-title {
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.menu-meal-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* MEAL PREP LIST STYLES */
+.prep-step {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid white;
+    border-radius: 4px;
+}
