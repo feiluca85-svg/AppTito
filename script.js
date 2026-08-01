@@ -261,41 +261,57 @@ document.addEventListener('DOMContentLoaded', () => {
             textSpan.textContent = key;
             
             const delBtn = document.createElement('button');
-            delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            delBtn.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
             delBtn.style.background = 'transparent';
             delBtn.style.border = 'none';
             delBtn.style.color = '#ff4d4d';
             delBtn.style.cursor = 'pointer';
-            delBtn.style.fontSize = '1.2rem';
-            delBtn.style.padding = '15px'; // Touch target più grande
-            delBtn.style.margin = '-10px'; // Compensa il padding
-            delBtn.style.minWidth = '44px';
-            delBtn.style.minHeight = '44px';
+            delBtn.style.fontSize = '1.4rem';
+            delBtn.style.padding = '10px';
+            delBtn.style.display = 'none'; // Nascosto di default
 
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation(); // Previene il click sul div padre
-                setTimeout(() => {
-                    if (confirm(`Vuoi davvero eliminare la settimana "${key}"?`)) {
-                        delete weeksData[key];
-                        if (activeWeekId === key) {
-                            const remaining = Object.keys(weeksData).sort().reverse();
-                            activeWeekId = remaining.length > 0 ? remaining[0] : null;
-                        }
-                        saveState();
-                        renderSidebar();
-                        updateHomePreviews();
-                        // Se siamo su una view di dettaglio e cancelliamo quella attiva, torniamo alla home per evitare errori
-                        if (document.getElementById('homeView').style.display === 'none') {
-                            showView(document.getElementById('homeView'));
-                        }
+                if (confirm(`Vuoi davvero eliminare la settimana "${key}"?`)) {
+                    delete weeksData[key];
+                    if (activeWeekId === key) {
+                        const remaining = Object.keys(weeksData).sort().reverse();
+                        activeWeekId = remaining.length > 0 ? remaining[0] : null;
                     }
-                }, 10);
+                    saveState();
+                    renderSidebar();
+                    updateHomePreviews();
+                    if (document.getElementById('homeView').style.display === 'none') {
+                        showView(document.getElementById('homeView'));
+                    }
+                }
             });
 
             div.appendChild(textSpan);
             div.appendChild(delBtn);
 
-            div.addEventListener('click', () => {
+            let pressTimer;
+            let longPressed = false;
+
+            div.addEventListener('touchstart', () => {
+                longPressed = false;
+                pressTimer = setTimeout(() => {
+                    longPressed = true;
+                    // Mostra/Nascondi il bottone di eliminazione
+                    delBtn.style.display = delBtn.style.display === 'none' ? 'inline-block' : 'none';
+                }, 800);
+            });
+            div.addEventListener('touchend', () => clearTimeout(pressTimer));
+            div.addEventListener('touchcancel', () => clearTimeout(pressTimer));
+            // Aggiungiamo anche contextmenu (tasto destro o long press su desktop)
+            div.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                delBtn.style.display = delBtn.style.display === 'none' ? 'inline-block' : 'none';
+            });
+
+            div.addEventListener('click', (e) => {
+                if (longPressed) return; // Se era un long-press, non selezionare la settimana
+                
                 activeWeekId = key;
                 saveState();
                 updateHomePreviews();
