@@ -27,6 +27,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Error loading state", e);
     }
 
+    // Auto-recharge vouchers on the 6th of each month
+    const checkVoucherRecharge = () => {
+        const today = new Date();
+        const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
+        const lastRechargeMonth = localStorage.getItem('lastVoucherRechargeMonth');
+
+        if (today.getDate() >= 6 && lastRechargeMonth !== currentMonthKey) {
+            budgetVouchers = 90.0;
+            localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
+            localStorage.setItem('lastVoucherRechargeMonth', currentMonthKey);
+            alert("Oggi è passato il 6 del mese! Il budget dei Buoni Celiachia è stato ripristinato automaticamente a 90.00 €.");
+        }
+    };
+    checkVoucherRecharge();
+
     const saveState = () => {
         localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
         if (activeWeekId) localStorage.setItem('pasto_pronto_active_week', activeWeekId);
@@ -591,6 +606,34 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTilePrefs();
     updateHomePreviews();
 });
+
+// Add custom grocery item
+window.addCustomGroceryItem = () => {
+    const input = document.getElementById('customGroceryInput');
+    const itemName = input.value.trim();
+    if (!itemName) return;
+
+    try {
+        const weeksDataObj = JSON.parse(localStorage.getItem('pasto_pronto_weeks') || '{}');
+        const activeWeekId = localStorage.getItem('pasto_pronto_active_week') || null;
+        
+        if (activeWeekId && weeksDataObj[activeWeekId]) {
+            weeksDataObj[activeWeekId].groceryList.push({
+                item: itemName,
+                category: "Aggiunti a Mano",
+                estimatedPrice: 0,
+                useVoucher: false,
+                checked: false
+            });
+            localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksDataObj));
+            input.value = '';
+            // Ricarica la pagina per renderizzare di nuovo o trigghera un evento
+            location.reload(); 
+        }
+    } catch(e) {
+        console.error(e);
+    }
+};
 
 // Booklet export function
 window.exportMenuBooklet = () => {
