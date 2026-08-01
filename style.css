@@ -40,6 +40,15 @@ body {
     align-items: center;
 }
 
+
+
+#appHeaderTitle {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    cursor: pointer;
+}
+
 .pivot-title {
     font-size: 3.5rem;
     font-weight: 300;
