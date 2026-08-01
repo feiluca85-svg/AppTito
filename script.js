@@ -591,7 +591,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        Object.entries(activeData.menu).forEach(([giorno, dayData]) => {
+        const giorniSettimana = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+        const sortedEntries = Object.entries(activeData.menu).sort((a, b) => {
+            const idxA = giorniSettimana.indexOf(a[0].toLowerCase());
+            const idxB = giorniSettimana.indexOf(b[0].toLowerCase());
+            return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+        });
+
+        sortedEntries.forEach(([giorno, dayData]) => {
             const prepKey = activeData.prepTimes ? Object.keys(activeData.prepTimes).find(k => k.toLowerCase() === giorno.toLowerCase()) : null;
             const prepTime = prepKey ? activeData.prepTimes[prepKey] : '';
             
