@@ -517,8 +517,17 @@ select.metro-input:focus {
     
     /* Grocery overrides */
     .grocery-checkbox { display: none !important; }
-    #groceryListContainer label { text-decoration: none !important; opacity: 1 !important; margin-bottom: 3px; display: block; }
+    #groceryListContainer label { text-decoration: none !important; opacity: 1 !important; margin-bottom: 3px; display: block; color: black !important; }
     #groceryListContainer { padding: 0 !important; }
+    .grocery-category-block {
+        background: white !important;
+        border: 1px solid #000 !important;
+        border-left: 4px solid #000 !important;
+        color: black !important;
+        margin-bottom: 10px !important;
+        padding: 10px !important;
+    }
+    .grocery-category-block h3 { color: black !important; }
 
     /* Meal Prep overrides */
     #prepContainer { background: white !important; color: black !important; border: none; padding: 0 !important; }

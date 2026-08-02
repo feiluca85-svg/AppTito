@@ -466,6 +466,62 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('vouchersHomePreview').textContent = `${budgetVouchers.toFixed(2)} €`;
     };
 
+    // Receipt History Logic
+    const renderReceiptsHistory = () => {
+        const container = document.getElementById('receiptsHistoryContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const activeData = activeWeekId ? weeksData[activeWeekId] : null;
+        const receipts = (activeData && activeData.receipts) ? activeData.receipts : [];
+
+        if (receipts.length === 0) {
+            container.innerHTML = '<div style="color:var(--text-secondary); font-size: 0.95rem;">Nessuno scontrino registrato per questa settimana.</div>';
+            return;
+        }
+
+        receipts.forEach((r, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.style.cssText = "background: #1e1e1e; padding: 12px 15px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; gap: 10px;";
+            
+            const badgeBg = r.paymentType === 'vouchers' ? '#f0a30a' : '#a20025';
+            const badgeText = r.paymentType === 'vouchers' ? 'BUONI SG' : 'CASH';
+
+            itemDiv.innerHTML = `
+                <div style="display:flex; align-items:center; gap: 12px;">
+                    ${r.img ? `<img src="${r.img}" style="width: 42px; height: 42px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #444;" onclick="window.open('${r.img}', '_blank')" title="Ingrandisci scontrino">` : `<i class="fa-solid fa-receipt" style="font-size: 1.5rem; color: #888;"></i>`}
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1rem; color: #fff;">- ${parseFloat(r.amount).toFixed(2)} €</div>
+                        <div style="font-size: 0.8rem; color: #aaa;">${r.date || ''} <span style="background:${badgeBg}; color:white; padding: 1px 6px; border-radius: 3px; font-weight: bold; margin-left: 5px;">${badgeText}</span></div>
+                    </div>
+                </div>
+                <button class="metro-icon-btn delete-receipt-btn" data-index="${index}" style="background: none; color: #ff4d4d;" title="Elimina e riaccredita importo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(itemDiv);
+        });
+
+        container.querySelectorAll('.delete-receipt-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'), 10);
+                if (confirm("Vuoi davvero eliminare questo scontrino e riaccreditare l'importo nel budget?")) {
+                    const deleted = activeData.receipts.splice(idx, 1)[0];
+                    if (deleted) {
+                        if (deleted.paymentType === 'vouchers') {
+                            budgetVouchers += parseFloat(deleted.amount);
+                        } else {
+                            budgetCash += parseFloat(deleted.amount);
+                        }
+                        saveState();
+                        renderBudget();
+                        renderVouchers();
+                    }
+                }
+            });
+        });
+    };
+
     // Budget Tracker Logic
     const renderBudget = () => {
         const remainingEl = document.getElementById('cashRemaining');
@@ -485,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
             msgEl.textContent = "Bravi! Siete perfettamente in budget.";
             msgEl.style.color = '#00a300';
         }
+
+        renderReceiptsHistory();
     };
 
     document.getElementById('addCashExpenseBtn').addEventListener('click', () => {
@@ -504,6 +562,84 @@ document.addEventListener('DOMContentLoaded', () => {
             renderBudget();
         }
     });
+
+    // Receipt Upload Modal Handling
+    const uploadReceiptBtn = document.getElementById('uploadReceiptBtn');
+    const receiptFileInput = document.getElementById('receiptFileInput');
+    const receiptModal = document.getElementById('receiptModal');
+    const closeReceiptBtn = document.getElementById('closeReceiptBtn');
+    const confirmReceiptBtn = document.getElementById('confirmReceiptBtn');
+    const receiptPreviewImg = document.getElementById('receiptPreviewImg');
+    const receiptAmountInput = document.getElementById('receiptAmountInput');
+    const receiptPaymentType = document.getElementById('receiptPaymentType');
+    let currentReceiptImageData = null;
+
+    if (uploadReceiptBtn && receiptFileInput) {
+        uploadReceiptBtn.addEventListener('click', () => {
+            receiptFileInput.click();
+        });
+
+        receiptFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentReceiptImageData = event.target.result;
+                receiptPreviewImg.src = currentReceiptImageData;
+                receiptPreviewImg.style.display = 'block';
+                receiptAmountInput.value = '';
+                receiptModal.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (closeReceiptBtn) {
+        closeReceiptBtn.addEventListener('click', () => {
+            receiptModal.classList.remove('active');
+            currentReceiptImageData = null;
+            receiptFileInput.value = '';
+        });
+    }
+
+    if (confirmReceiptBtn) {
+        confirmReceiptBtn.addEventListener('click', () => {
+            const amount = parseFloat(receiptAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Inserisci un importo valido per lo scontrino!");
+                return;
+            }
+
+            const paymentType = receiptPaymentType.value;
+            const todayStr = new Date().toLocaleDateString('it-IT');
+
+            if (paymentType === 'vouchers') {
+                budgetVouchers -= amount;
+            } else {
+                budgetCash -= amount;
+            }
+
+            const activeData = activeWeekId ? weeksData[activeWeekId] : null;
+            if (activeData) {
+                if (!activeData.receipts) activeData.receipts = [];
+                activeData.receipts.push({
+                    id: 'rcpt_' + Date.now(),
+                    date: todayStr,
+                    amount: amount,
+                    paymentType: paymentType,
+                    img: currentReceiptImageData
+                });
+            }
+
+            saveState();
+            receiptModal.classList.remove('active');
+            receiptFileInput.value = '';
+            currentReceiptImageData = null;
+            renderBudget();
+            renderVouchers();
+        });
+    }
 
     // Vouchers Tracker Logic
     const renderVouchers = () => {
@@ -528,7 +664,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Grocery Logic
+    // Grocery Logic Categorization Helpers
+    const normalizeCategory = (cat) => {
+        if (!cat) return 'Altro';
+        const c = String(cat).toLowerCase().trim();
+        if (c.includes('orto') || c.includes('frutt') || c.includes('verdur')) return 'Ortofrutta';
+        if (c.includes('carn') || c.includes('pesc') || c.includes('poll') || c.includes('tacch')) return 'Carne e Pesce';
+        if (c.includes('latt') || c.includes('salum') || c.includes('formagg') || c.includes('uov') || c.includes('yogurt')) return 'Latticini e Salumi';
+        if (c.includes('pane') || c.includes('carb') || c.includes('glutin') || c.includes('biscott') || c.includes('farin') || c.includes('sg')) return 'Panetteria e SG';
+        if (c.includes('surgel') || c.includes('gelat')) return 'Surgelati';
+        if (c.includes('dispens') || c.includes('secc') || c.includes('oli') || c.includes('scatol') || c.includes('legum') || c.includes('ris')) return 'Dispensa';
+        return 'Altro';
+    };
+
+    const categoryOrder = [
+        { key: 'Ortofrutta', title: 'Ortofrutta', icon: '🥬', color: '#27ae60' },
+        { key: 'Carne e Pesce', title: 'Carne & Pesce', icon: '🥩', color: '#c0392b' },
+        { key: 'Latticini e Salumi', title: 'Latticini & Salumi', icon: '🧀', color: '#f39c12' },
+        { key: 'Panetteria e SG', title: 'Panetteria & SG', icon: '🍞', color: '#d35400' },
+        { key: 'Surgelati', title: 'Surgelati', icon: '❄️', color: '#2980b9' },
+        { key: 'Dispensa', title: 'Dispensa', icon: '🥫', color: '#8e44ad' },
+        { key: 'Altro', title: 'Altro / Manuali', icon: '🛒', color: '#7f8c8d' }
+    ];
+
     const renderGrocery = () => {
         const container = document.getElementById('groceryListContainer');
         container.innerHTML = '';
@@ -539,28 +697,65 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let html = `<div style="display: flex; flex-direction: column; gap: 15px; background: #1e1e1e; padding: 20px;">`;
+        // Raggruppa gli elementi per categoria
+        const grouped = {};
+        categoryOrder.forEach(c => { grouped[c.key] = []; });
+
         activeData.groceryList.forEach((item, index) => {
-            const checked = item.checked ? 'checked' : '';
-            const style = item.checked ? 'text-decoration: line-through; opacity: 0.6;' : '';
-            const voucherBadge = item.useVoucher ? `<span style="background: #fff; color: #00a300; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px;">BUONO</span>` : '';
-            
-            html += `
-                <label style="display: flex; align-items: center; gap: 15px; cursor: pointer; ${style}">
-                    <input type="checkbox" data-index="${index}" class="grocery-checkbox" ${checked} style="width: 25px; height: 25px; flex-shrink: 0;">
-                    <span>${item.item} (${item.estimatedPrice}€) ${voucherBadge}</span>
-                </label>
+            const catKey = normalizeCategory(item.category);
+            if (!grouped[catKey]) grouped[catKey] = [];
+            grouped[catKey].push({ ...item, originalIndex: index });
+        });
+
+        let mainHtml = '';
+        categoryOrder.forEach(catMeta => {
+            const items = grouped[catMeta.key];
+            if (!items || items.length === 0) return;
+
+            const completedCount = items.filter(i => i.checked).length;
+            const totalCount = items.length;
+
+            mainHtml += `
+                <div class="grocery-category-block" style="background: #1e1e1e; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ${catMeta.color};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 600; color: #fff;">
+                            ${catMeta.icon} ${catMeta.title}
+                        </h3>
+                        <span style="font-size: 0.85rem; background: #333; color: #bbb; padding: 2px 8px; border-radius: 12px;">
+                            ${completedCount}/${totalCount}
+                        </span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+            `;
+
+            items.forEach(item => {
+                const checked = item.checked ? 'checked' : '';
+                const style = item.checked ? 'text-decoration: line-through; opacity: 0.55;' : '';
+                const priceStr = item.estimatedPrice ? ` (${item.estimatedPrice}€)` : '';
+                const voucherBadge = item.useVoucher ? `<span style="background: #fff; color: #00a300; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 5px;">BUONO</span>` : '';
+
+                mainHtml += `
+                    <label style="display: flex; align-items: center; gap: 14px; cursor: pointer; ${style}">
+                        <input type="checkbox" data-index="${item.originalIndex}" class="grocery-checkbox" ${checked} style="width: 24px; height: 24px; flex-shrink: 0; cursor: pointer;">
+                        <span style="font-size: 1.05rem;">${item.item}${priceStr} ${voucherBadge}</span>
+                    </label>
+                `;
+            });
+
+            mainHtml += `
+                    </div>
+                </div>
             `;
         });
-        html += `</div>`;
-        container.innerHTML = html;
+
+        container.innerHTML = mainHtml;
 
         document.querySelectorAll('.grocery-checkbox').forEach(box => {
             box.addEventListener('change', (e) => {
                 const idx = e.target.getAttribute('data-index');
                 weeksData[activeWeekId].groceryList[idx].checked = e.target.checked;
                 saveState();
-                renderGrocery(); // Re-render per lo strikethrough
+                renderGrocery();
             });
         });
     };
@@ -674,21 +869,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Init
     window.addCustomGroceryItem = () => {
         const input = document.getElementById('customGroceryInput');
+        const select = document.getElementById('customCategorySelect');
         const itemName = input.value.trim();
+        const categoryName = select ? select.value : "Altro";
         if (!itemName) return;
 
         if (activeWeekId && weeksData[activeWeekId]) {
+            if (!weeksData[activeWeekId].groceryList) {
+                weeksData[activeWeekId].groceryList = [];
+            }
             weeksData[activeWeekId].groceryList.push({
                 item: itemName,
-                category: "Aggiunti a Mano",
+                category: categoryName,
                 estimatedPrice: 0,
                 useVoucher: false,
                 checked: false
             });
             saveState();
             input.value = '';
-            // Since saveState syncs to Firebase, Firebase listener will trigger reRenderActiveView automatically!
-            // But just in case, we force render here.
             renderGrocery();
         }
     };

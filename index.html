@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=55">
+    <link rel="stylesheet" href="style.css?v=56">
     
     <!-- PWA meta tags -->
     <link rel="manifest" href="manifest.json">
@@ -87,7 +87,17 @@
                 <input type="number" id="cashInput" class="metro-input" placeholder="Es. 45.50" step="0.01">
             </div>
             <button class="metro-btn" id="addCashExpenseBtn" style="background: #a20025;">Sottrai dal Budget</button>
-            <button class="metro-btn" id="resetCashBtn" style="background: #666; margin-top: 10px;">Resetta Budget Manualmente</button>
+            <button class="metro-btn" id="uploadReceiptBtn" style="background: #2b579a; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+                <i class="fa-solid fa-receipt"></i> Carica Scontrino 🧾
+            </button>
+            <input type="file" id="receiptFileInput" accept="image/*" capture="environment" style="display: none;">
+            <button class="metro-btn" id="resetCashBtn" style="background: #444; margin-top: 10px;">Resetta Budget Manualmente</button>
+
+            <!-- Storico scontrini -->
+            <div style="margin-top: 30px; text-align: left;">
+                <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 10px;">Storico Scontrini</h3>
+                <div id="receiptsHistoryContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
         </div>
 
         <div id="vouchersView" class="detail-view" style="display: none;">
@@ -109,8 +119,17 @@
                 <h2 style="font-weight: 300; margin: 0;">Lista della Spesa</h2>
                 <button class="metro-icon-btn" onclick="window.print()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
             </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;" class="no-print">
-                <input type="text" id="customGroceryInput" class="metro-input" placeholder="Aggiungi prodotto manuale..." style="flex: 1;">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;" class="no-print">
+                <input type="text" id="customGroceryInput" class="metro-input" placeholder="Aggiungi prodotto manuale..." style="flex: 1; min-width: 180px;">
+                <select id="customCategorySelect" class="metro-input" style="flex: 0 0 140px; background: #2a2a2a;">
+                    <option value="Ortofrutta">🥬 Ortofrutta</option>
+                    <option value="Carne e Pesce">🥩 Carne & Pesce</option>
+                    <option value="Latticini e Salumi">🧀 Latticini & Salumi</option>
+                    <option value="Panetteria e SG">🍞 Panetteria & SG</option>
+                    <option value="Surgelati">❄️ Surgelati</option>
+                    <option value="Dispensa">🥫 Dispensa</option>
+                    <option value="Altro" selected>🛒 Altro</option>
+                </select>
                 <button class="metro-btn" onclick="window.addCustomGroceryItem()" style="background: #00a300; width: 50px; flex: 0 0 50px; padding: 0; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-plus"></i></button>
             </div>
             <div id="groceryListContainer" style="font-size: 1.1rem; text-align: left;"></div>
@@ -133,6 +152,31 @@
         </div>
         
     </main>
+
+    <!-- Receipt Modal -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-content" style="max-width: 420px; text-align: left;">
+            <h2 class="settings-title">registra scontrino</h2>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <img id="receiptPreviewImg" src="" alt="Anteprima scontrino" style="max-height: 220px; width: auto; max-width: 100%; border: 1px solid #444; border-radius: 6px; display: none;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Importo Totale Scontrino (€)</label>
+                <input type="number" id="receiptAmountInput" class="metro-input" placeholder="Es. 34.50" step="0.01">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Modalità di Pagamento</label>
+                <select id="receiptPaymentType" class="metro-input">
+                    <option value="cash">Budget Cash (Contanti / Carta)</option>
+                    <option value="vouchers">Buoni Celiachia (Senza Glutine)</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="metro-btn" id="closeReceiptBtn" style="flex: 1; background: #666;">Annulla</button>
+                <button class="metro-btn" id="confirmReceiptBtn" style="flex: 1; background: #00a300; font-weight: bold;">Detrai dal Budget</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Import JSON Modal -->
     <div class="modal-overlay" id="importModal">
@@ -176,13 +220,13 @@
                 <!-- Lista generata dinamicamente -->
             </div>
             <div style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem; padding-bottom: 10px;">
-                Versione 55
+                Versione 56
             </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="script.js?v=55"></script>
+    <script src="script.js?v=56"></script>
 </body>
 </html>
