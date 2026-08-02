@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=57">
+    <link rel="stylesheet" href="style.css?v=58">
     
     <!-- PWA meta tags -->
     <link rel="manifest" href="manifest.json">
@@ -162,7 +162,12 @@
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Importo Totale Scontrino (€)</label>
-                <input type="number" id="receiptAmountInput" class="metro-input" placeholder="Es. 34.50" step="0.01">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="number" id="receiptAmountInput" class="metro-input" placeholder="Es. 34.50" step="0.01" style="flex: 1;">
+                    <div id="receiptOcrLoader" style="display: none; color: #00a300; font-size: 0.9rem;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Lettura...
+                    </div>
+                </div>
             </div>
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Modalità di Pagamento</label>
@@ -220,13 +225,19 @@
                 <!-- Lista generata dinamicamente -->
             </div>
             <div style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem; padding-bottom: 10px;">
-                Versione 57
+                Versione 58
             </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="script.js?v=57"></script>
+    <!-- OCR Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="script.js?v=58"></script>
 </body>
 </html>

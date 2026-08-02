@@ -574,6 +574,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const receiptPaymentType = document.getElementById('receiptPaymentType');
     let currentReceiptImageData = null;
 
+    const processReceiptFile = async (file) => {
+        const loader = document.getElementById('receiptOcrLoader');
+        const amountInput = document.getElementById('receiptAmountInput');
+        if(loader) loader.style.display = 'block';
+        
+        try {
+            let text = "";
+            if (file.type === 'application/pdf') {
+                const typedarray = new Uint8Array(await file.arrayBuffer());
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    text += textContent.items.map(item => item.str).join(" ") + " ";
+                }
+            } else {
+                const worker = await Tesseract.createWorker('ita');
+                const ret = await worker.recognize(file);
+                text = ret.data.text;
+                await worker.terminate();
+            }
+            
+            let priceRegex = /\b\d{1,4}[.,]\d{2}\b/g;
+            let prices = [];
+            let match;
+            while ((match = priceRegex.exec(text)) !== null) {
+                prices.push(parseFloat(match[0].replace(',', '.')));
+            }
+            if (prices.length === 0) {
+                let looseRegex = /\b\d{1,4}[., ]+\d{2}\b/g;
+                while ((match = looseRegex.exec(text)) !== null) {
+                    let val = parseFloat(match[0].replace(/[., ]+/g, '.'));
+                    if(!isNaN(val)) prices.push(val);
+                }
+            }
+            if (prices.length > 0) {
+                let maxPrice = Math.max(...prices);
+                if (maxPrice > 0 && maxPrice < 2000) {
+                    amountInput.value = maxPrice.toFixed(2);
+                }
+            }
+        } catch(e) {
+            console.error("Errore lettura scontrino:", e);
+        }
+        if(loader) loader.style.display = 'none';
+    };
+
     if (uploadReceiptBtn && receiptFileInput) {
         uploadReceiptBtn.addEventListener('click', () => {
             receiptFileInput.click();
@@ -596,6 +643,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 receiptPreviewImg.style.display = 'block';
                 receiptAmountInput.value = '';
                 receiptModal.classList.add('active');
+                
+                // Avvia OCR in background
+                processReceiptFile(file);
             };
             reader.readAsDataURL(file);
         });
