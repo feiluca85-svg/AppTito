@@ -897,26 +897,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('prepContainer');
         const activeData = activeWeekId ? weeksData[activeWeekId] : null;
         
-        if (!activeData || !activeData.mealPrep || (Array.isArray(activeData.mealPrep) && activeData.mealPrep.length === 0)) {
-            container.textContent = "Nessun meal prep trovato per questa settimana.";
+        if (!activeData || !activeData.mealPrep || (Array.isArray(activeData.mealPrep) && activeData.mealPrep.length === 0) || (typeof activeData.mealPrep === 'object' && Object.keys(activeData.mealPrep).length === 0)) {
+            container.innerHTML = '<div style="color:var(--text-secondary);">Nessun meal prep trovato per questa settimana.</div>';
         } else {
             container.innerHTML = '';
             
-            const extractSteps = (data) => {
-                if (Array.isArray(data)) return data;
-                if (typeof data === 'object') return Object.values(data);
-                if (typeof data === 'string') return data.split(/\n+/).filter(s => s.trim().length > 0);
-                return [String(data)];
-            };
+            // Retrocompatibilità per quando mealPrep era una stringa o array
+            if (Array.isArray(activeData.mealPrep) || typeof activeData.mealPrep === 'string') {
+                const extractSteps = (data) => {
+                    if (Array.isArray(data)) return data;
+                    if (typeof data === 'string') return data.split(/\n+/).filter(s => s.trim().length > 0);
+                    return [String(data)];
+                };
 
-            const steps = extractSteps(activeData.mealPrep);
-            
-            steps.forEach(step => {
-                const stepDiv = document.createElement('div');
-                stepDiv.className = 'prep-step';
-                stepDiv.innerHTML = safeStringify(step);
-                container.appendChild(stepDiv);
-            });
+                const steps = extractSteps(activeData.mealPrep);
+                
+                steps.forEach((step, index) => {
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'accordion-item';
+                    
+                    accordionItem.innerHTML = `
+                        <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                            <span>Fase ${index + 1}</span>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </div>
+                        <div class="accordion-body">
+                            ${safeStringify(step)}
+                        </div>
+                    `;
+                    container.appendChild(accordionItem);
+                });
+            } else if (typeof activeData.mealPrep === 'object') {
+                // Nuovo formato JSON Object con le Fasi
+                Object.entries(activeData.mealPrep).forEach(([fase, dettagli]) => {
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'accordion-item';
+                    
+                    accordionItem.innerHTML = `
+                        <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                            <span>${fase}</span>
+                            <i class="fa-solid fa-chevron-down chevron"></i>
+                        </div>
+                        <div class="accordion-body">
+                            ${safeStringify(dettagli)}
+                        </div>
+                    `;
+                    container.appendChild(accordionItem);
+                });
+            }
         }
     };
 
