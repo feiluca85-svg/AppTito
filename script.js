@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkVoucherRecharge();
 
     const saveState = () => {
+        // Rimuoviamo eventuali chiavi troppo pesanti o proteggiamo il localStorage
         docRef.set({
             weeksData: weeksData,
             activeWeekId: activeWeekId,
@@ -87,10 +88,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { merge: true }).catch(err => console.error("Errore salvataggio Cloud:", err));
         
         // Backup locale
-        localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
-        if (activeWeekId) localStorage.setItem('pasto_pronto_active_week', activeWeekId);
-        localStorage.setItem('pasto_pronto_cash', budgetCash.toString());
-        localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
+        try {
+            localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
+            if (activeWeekId) localStorage.setItem('pasto_pronto_active_week', activeWeekId);
+            localStorage.setItem('pasto_pronto_cash', budgetCash.toString());
+            localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
+        } catch(e) {
+            console.error("Errore salvataggio locale (QuotaExceeded?):", e);
+        }
     };
 
     // --- DOM ELEMENTS ---
@@ -683,8 +688,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: 'rcpt_' + Date.now(),
                     date: todayStr,
                     amount: amount,
-                    paymentType: paymentType,
-                    img: currentReceiptImageData
+                    paymentType: paymentType
+                    // img: currentReceiptImageData // RIMOSSO per evitare limiti di Firebase (1MB) e localStorage
                 });
             }
 
