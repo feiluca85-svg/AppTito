@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             itemDiv.innerHTML = `
                 <div style="display:flex; align-items:center; gap: 12px;">
-                    ${r.img ? `<img src="${r.img}" style="width: 42px; height: 42px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #444;" onclick="window.open('${r.img}', '_blank')" title="Ingrandisci scontrino">` : `<i class="fa-solid fa-receipt" style="font-size: 1.5rem; color: #888;"></i>`}
+                    ${r.img ? `<img src="${r.img.startsWith('data:application/pdf') ? 'https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg' : r.img}" style="width: 42px; height: 42px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #444; background: white;" onclick="window.open('${r.img}', '_blank')" title="Visualizza scontrino">` : `<i class="fa-solid fa-receipt" style="font-size: 1.5rem; color: #888;"></i>`}
                     <div>
                         <div style="font-weight: bold; font-size: 1.1rem; color: #fff;">- ${parseFloat(r.amount).toFixed(2)} €</div>
                         <div style="font-size: 0.8rem; color: #aaa;">${r.date || ''} <span style="background:${badgeBg}; color:white; padding: 1px 6px; border-radius: 3px; font-weight: bold; margin-left: 5px;">${badgeText}</span></div>
@@ -586,7 +586,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = (event) => {
                 currentReceiptImageData = event.target.result;
-                receiptPreviewImg.src = currentReceiptImageData;
+                if (file.type === 'application/pdf' || currentReceiptImageData.startsWith('data:application/pdf')) {
+                    receiptPreviewImg.src = 'https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg';
+                    receiptPreviewImg.style.background = 'white';
+                } else {
+                    receiptPreviewImg.src = currentReceiptImageData;
+                    receiptPreviewImg.style.background = 'transparent';
+                }
                 receiptPreviewImg.style.display = 'block';
                 receiptAmountInput.value = '';
                 receiptModal.classList.add('active');
