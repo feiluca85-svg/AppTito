@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeWeekId = null;
     let budgetCash = 100.0;
     let budgetVouchers = 90.0;
+    let lastCashRechargeMonday = null;
+    let lastVoucherRechargeMonth = null;
     
     // --- FIREBASE SYNC ---
     let isDbLoaded = false;
@@ -32,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             budgetCash = data.budgetCash !== undefined ? data.budgetCash : 100.00;
             budgetVouchers = data.budgetVouchers !== undefined ? data.budgetVouchers : 90.00;
+            lastCashRechargeMonday = data.lastCashRechargeMonday || null;
+            lastVoucherRechargeMonth = data.lastVoucherRechargeMonth || null;
             
             // Backup locale
             localStorage.setItem('pasto_pronto_weeks', JSON.stringify(weeksData));
@@ -40,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('pasto_pronto_vouchers', budgetVouchers.toString());
 
             isDbLoaded = true;
+            
+            // Controlla ricariche automatiche appena i dati sono sincronizzati
+            checkRecharges();
             
             // Aggiorna le viste attive
             updateHomePreviews();
@@ -63,20 +70,43 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Errore di sincronizzazione:", error);
     });
 
-    // Auto-recharge vouchers on the 6th of each month
-    const checkVoucherRecharge = () => {
+    const getRecentMonday = () => {
+        const d = new Date();
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diff));
+        return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+    };
+
+    const checkRecharges = () => {
+        if (!isDbLoaded) return;
+        let needsSave = false;
+        
+        // 1. Controllo ricarica Vouchers (il 6 del mese)
         const today = new Date();
         const currentMonthKey = `${today.getFullYear()}-${today.getMonth()}`;
-        const lastRechargeMonth = localStorage.getItem('lastVoucherRechargeMonth');
-
-        if (today.getDate() >= 6 && lastRechargeMonth !== currentMonthKey) {
+        if (today.getDate() >= 6 && lastVoucherRechargeMonth !== currentMonthKey) {
             budgetVouchers = 90.0;
-            saveState();
-            localStorage.setItem('lastVoucherRechargeMonth', currentMonthKey);
+            lastVoucherRechargeMonth = currentMonthKey;
+            needsSave = true;
             alert("Oggi è passato il 6 del mese! Il budget dei Buoni Celiachia è stato ripristinato automaticamente a 90.00 €.");
         }
+
+        // 2. Controllo ricarica Cash (100€ in più ogni Lunedì)
+        const currentMonday = getRecentMonday();
+        if (lastCashRechargeMonday !== currentMonday) {
+            budgetCash += 100.0;
+            lastCashRechargeMonday = currentMonday;
+            needsSave = true;
+            alert(`Buona settimana! Sono stati sommati automaticamente 100€ al budget Cash.\n\nNuovo totale: ${budgetCash.toFixed(2)} €`);
+        }
+
+        if (needsSave) {
+            saveState();
+            if (typeof renderBudget === 'function') renderBudget();
+            if (typeof renderVouchers === 'function') renderVouchers();
+        }
     };
-    checkVoucherRecharge();
 
     const saveState = () => {
         // Rimuoviamo eventuali chiavi troppo pesanti o proteggiamo il localStorage
@@ -84,7 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
             weeksData: weeksData,
             activeWeekId: activeWeekId,
             budgetCash: budgetCash,
-            budgetVouchers: budgetVouchers
+            budgetVouchers: budgetVouchers,
+            lastCashRechargeMonday: lastCashRechargeMonday,
+            lastVoucherRechargeMonth: lastVoucherRechargeMonth
         }, { merge: true }).catch(err => console.error("Errore salvataggio Cloud:", err));
         
         // Backup locale
