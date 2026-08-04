@@ -140,6 +140,12 @@
                 <h2 style="font-weight: 300; margin: 0;">Menu Settimanale</h2>
                 <button class="metro-icon-btn" onclick="exportMenuBooklet()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
             </div>
+            <div class="menu-filter-container" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px;">
+                <button class="filter-pill active" onclick="setMenuFilter('Tutti')">Tutti</button>
+                <button class="filter-pill" onclick="setMenuFilter('Luca')">Luca</button>
+                <button class="filter-pill" onclick="setMenuFilter('Ilaria')">Ilaria</button>
+                <button class="filter-pill" onclick="setMenuFilter('Petra')">Petra</button>
+            </div>
             <div id="menuDaysContainer"></div>
         </div>
 
@@ -225,7 +231,7 @@
                 <!-- Lista generata dinamicamente -->
             </div>
             <div style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem; padding-bottom: 10px;">
-                Versione 61
+                Versione 62
             </div>
         </div>
     </div>
@@ -238,6 +244,6 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
-    <script src="script.js?v=61"></script>
+    <script src="script.js?v=62"></script>
 </body>
 </html>

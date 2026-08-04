@@ -723,3 +723,37 @@ select.metro-input:focus {
 .meal-detail-value {
     color: var(--text-secondary);
 }
+
+/* FILTER PILLS & HIGHLIGHTING */
+.menu-filter-container::-webkit-scrollbar {
+    display: none;
+}
+.filter-pill {
+    background: #333;
+    border: 1px solid #555;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.filter-pill.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    font-weight: 600;
+}
+.highlight-dimmed {
+    opacity: 0.25;
+    transition: opacity 0.3s ease;
+}
+.highlight-active {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.15);
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: all 0.3s ease;
+    color: #fff;
+}

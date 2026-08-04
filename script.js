@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let budgetVouchers = 90.0;
     let lastCashRechargeMonday = null;
     let lastVoucherRechargeMonth = null;
+    let currentMenuFilter = 'Tutti';
     
     // --- FIREBASE SYNC ---
     let isDbLoaded = false;
@@ -854,6 +855,52 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Menu Logic
+    window.setMenuFilter = (filterName) => {
+        currentMenuFilter = filterName;
+        document.querySelectorAll('.filter-pill').forEach(btn => {
+            if (btn.innerText === filterName) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        renderMenu();
+    };
+
+    const applyHighlightFilter = (htmlString, filterName) => {
+        if (filterName === 'Tutti' || !htmlString) return htmlString;
+        
+        const pattern = /(Luca[^:]*:|Ilaria[^:]*:|Petra[^:]*:|Per tutti[^:]*:|👨‍🍳\s*Procedura[^:]*:|Procedura[^:]*:)/gi;
+        const parts = htmlString.split(pattern);
+        if (parts.length === 1) return htmlString;
+
+        let result = '';
+        let currentClass = '';
+
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            if (!part) continue;
+
+            if (part.match(/^(Luca|Ilaria|Petra|Per tutti|👨‍🍳\s*Procedura|Procedura)/i)) {
+                if (part.toLowerCase().includes('procedura')) {
+                    currentClass = '';
+                    result += part; 
+                } else {
+                    const matchesFilter = part.toLowerCase().includes(filterName.toLowerCase()) || part.toLowerCase().includes("per tutti");
+                    currentClass = matchesFilter ? 'highlight-active' : 'highlight-dimmed';
+                    result += `<span class="${currentClass}">${part}</span>`;
+                }
+            } else {
+                if (i === 0 || !currentClass) {
+                    result += part;
+                } else {
+                    result += `<span class="${currentClass}">${part}</span>`;
+                }
+            }
+        }
+        return result;
+    };
+
     const safeStringify = (data) => {
         if (!data) return '-';
         if (typeof data === 'string') return data.replace(/\n/g, '<br>');
@@ -893,11 +940,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const accordionItem = document.createElement('div');
             accordionItem.className = 'accordion-item';
             
-            const bfast = safeStringify(dayData.breakfast);
-            const s1 = dayData.snack1 ? `<br><br><strong>Spuntino:</strong><br>${safeStringify(dayData.snack1)}` : '';
-            const lunch = safeStringify(dayData.lunch);
-            const s2 = dayData.snack2 ? `<br><br><strong>Merenda:</strong><br>${safeStringify(dayData.snack2)}` : '';
-            const dinner = safeStringify(dayData.dinner);
+            const bfast = applyHighlightFilter(safeStringify(dayData.breakfast), currentMenuFilter);
+            const s1 = dayData.snack1 ? `<br><br><strong>Spuntino:</strong><br>${applyHighlightFilter(safeStringify(dayData.snack1), currentMenuFilter)}` : '';
+            const lunch = applyHighlightFilter(safeStringify(dayData.lunch), currentMenuFilter);
+            const s2 = dayData.snack2 ? `<br><br><strong>Merenda:</strong><br>${applyHighlightFilter(safeStringify(dayData.snack2), currentMenuFilter)}` : '';
+            const dinner = applyHighlightFilter(safeStringify(dayData.dinner), currentMenuFilter);
 
             accordionItem.innerHTML = `
                 <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
