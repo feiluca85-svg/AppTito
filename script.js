@@ -79,6 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
     };
 
+    const getISOWeekString = (d = new Date()) => {
+        const date = new Date(d.getTime());
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+        const week1 = new Date(date.getFullYear(), 0, 4);
+        const weekNumber = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        return `${date.getFullYear()}-${String(weekNumber).padStart(2, '0')}`;
+    };
+
     const checkRecharges = () => {
         if (!isDbLoaded) return;
         let needsSave = false;
@@ -344,6 +353,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const openSidebar = () => {
         sidebarOverlay.classList.add('active');
         setTimeout(() => { sidebarContent.style.transform = 'translateX(0)'; }, 10);
+        
+        // Mostra la settimana corrente sotto il tasto chiudi
+        const currentWeekIndicator = document.getElementById('currentWeekIndicator');
+        if (currentWeekIndicator) {
+            currentWeekIndicator.textContent = getISOWeekString();
+        }
+        
         renderSidebar();
     };
 
@@ -442,13 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             jsonInputArea.value = '';
             
-            // Proponi il nome della settimana (es. 2026-08-01)
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            // Approssimazione settimana del mese
-            const weekOfMonth = Math.ceil(now.getDate() / 7);
-            weekNameInput.value = `${year}-${month}-0${weekOfMonth}`;
+            // Proponi il nome della settimana nel nuovo formato (es. 2026-35)
+            weekNameInput.value = getISOWeekString();
             
             importModal.classList.add('active');
         }, 300);
