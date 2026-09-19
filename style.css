@@ -537,10 +537,8 @@ select.metro-input:focus {
         page-break-inside: avoid;
     }
 
-    /* Clean Menu Print Layout */
     .print-only-container {
         display: block !important;
-        width: 100%;
         color: #000;
         background: #fff;
         margin: 0 !important;
@@ -564,26 +562,33 @@ select.metro-input:focus {
         color: #444;
     }
     .print-days-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        align-items: start;
+        display: block;
+        overflow: hidden;
     }
     .print-day-card {
+        float: left;
+        width: 48%;
+        margin-right: 4%;
+        margin-bottom: 12px;
         border: 1px solid #222;
         border-radius: 4px;
         page-break-inside: avoid;
         break-inside: avoid;
         background: #fff;
-        overflow: hidden;
-        margin-bottom: 0;
+    }
+    .print-day-card:nth-child(2n) {
+        margin-right: 0;
+        clear: right;
+    }
+    .print-day-card:nth-child(2n+1) {
+        clear: left;
     }
     .print-day-header {
         background: #f0f0f0 !important;
         color: #000 !important;
         font-weight: bold;
-        font-size: 9pt;
-        padding: 4px 8px;
+        font-size: 8.5pt;
+        padding: 3px 6px;
         border-bottom: 1px solid #222;
         display: flex;
         justify-content: space-between;
@@ -591,13 +596,13 @@ select.metro-input:focus {
         text-transform: uppercase;
     }
     .print-day-body {
-        padding: 6px 8px;
+        padding: 4px 6px;
         background: #fff !important;
         color: #000 !important;
     }
     .print-meal-section {
-        margin-bottom: 5px;
-        padding-bottom: 4px;
+        margin-bottom: 4px;
+        padding-bottom: 3px;
         border-bottom: 1px dashed #bbb;
     }
     .print-meal-section:last-child {
@@ -607,14 +612,14 @@ select.metro-input:focus {
     }
     .print-meal-name {
         font-weight: bold;
-        font-size: 9pt;
+        font-size: 8pt;
         color: #000;
-        margin-bottom: 1px;
+        margin-bottom: 0;
     }
     .print-meal-desc {
-        font-size: 8.5pt;
+        font-size: 8pt;
         color: #222;
-        line-height: 1.25;
+        line-height: 1.15;
     }
     .print-meal-desc strong {
         color: #000;

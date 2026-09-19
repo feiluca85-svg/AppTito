@@ -1107,13 +1107,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (part.match(/^(Luca|Ilaria|Petra|Per tutti|👨‍🍳\s*Procedura|Procedura)/i)) {
                 if (part.toLowerCase().includes('procedura')) {
                     keepCurrentSection = true;
-                    result += (result ? '<div style="margin-top: 4px;"></div>' : '') + `<strong>${part}</strong>`;
+                    result += (result ? '<div style="margin-top: 2px;"></div>' : '') + `<strong>${part}</strong>`;
                 } else {
                     const isForTarget = part.toLowerCase().includes(person.toLowerCase());
                     const isForEveryone = part.toLowerCase().includes('per tutti') || part.toLowerCase().includes('tutti');
                     if (isForTarget || isForEveryone) {
                         keepCurrentSection = true;
-                        result += (result ? '<div style="margin-top: 4px;"></div>' : '') + `<strong>${part}</strong>`;
+                        result += (result ? '<div style="margin-top: 2px;"></div>' : '') + `<strong>${part}</strong>`;
                     } else {
                         keepCurrentSection = false;
                     }
@@ -1221,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             window.print();
-        }, 150);
+        }, 500);
     };
 
     applyTilePrefs();
