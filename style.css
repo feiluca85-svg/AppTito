@@ -488,32 +488,28 @@ select.metro-input:focus {
 }
 
 /* Print Styles */
-.print-only-prep { display: none !important; }
+.print-only-prep, .print-only-container { display: none !important; }
 
 @media print {
-    .print-only-prep { display: flex !important; }
-
     @page {
-        size: A4 landscape;
-        margin: 0mm; /* Rimuove intestazioni e piè di pagina del browser */
+        size: A4 portrait;
+        margin: 10mm;
     }
     html, body {
         margin: 0 !important;
         padding: 0 !important;
-        background: white; color: black; font-size: 8pt; line-height: 1.15;
+        background: white; color: black; font-size: 9pt; line-height: 1.3;
     }
     .pivot-header, .modal-overlay, #homeView { display: none !important; }
     
-    /* Nascondi il titolo h2 e i bottoni */
-    #menuView h2, .metro-btn, .metro-icon-btn, input, .fa-solid { display: none !important; }
+    /* Nascondi controlli interfaccia */
+    #menuView h2, .metro-btn, .metro-icon-btn, input, .fa-solid, .menu-filter-container, #menuDaysContainer { display: none !important; }
     
-    /* Nascondi i contenitori delle intestazioni per rimuovere il margin-bottom che crea la prima pagina bianca */
+    /* Nascondi i contenitori delle intestazioni */
     .detail-view > div:first-child { display: none !important; }
     
     .detail-view { box-shadow: none; animation: none; padding: 0 !important; }
-    .detail-view.force-print { display: block !important; page-break-before: always; }
-    .metro-tile { border: 1px solid #ccc; break-inside: avoid; background: white !important; color: black !important; }
-    .tile-title { color: black; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; }
+    .detail-view.force-print { display: block !important; }
     
     /* Grocery overrides */
     .grocery-checkbox { display: none !important; }
@@ -540,84 +536,85 @@ select.metro-input:focus {
         page-break-inside: avoid;
     }
 
-    /* Menu Accordion overrides */
-    #menuDaysContainer {
-        display: grid;
-        grid-template-columns: 140mm 140mm; /* Aumentato leggermente la larghezza per bilanciare il nuovo margine */
-        justify-content: space-between; /* Spinge verso i bordi esterni */
-        padding: 0 1.5mm; /* 1.5mm dai bordi esterni del foglio A4 */
+    /* Clean Menu Print Layout */
+    .print-only-container {
+        display: block !important;
         width: 100%;
-        box-sizing: border-box;
-        margin: 0;
+        color: #000;
+        background: #fff;
     }
-    .accordion-item {
-        background: white !important;
-        color: black !important;
-        border: 2px solid #000 !important;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        height: 198mm; /* Ritoccato per migliore centratura verticale */
-        width: 100%;
-        overflow: hidden;
-        margin: 5mm 0 !important; /* Margine superiore e inferiore di 5mm, totale 208mm per non sforare i 210mm */
+    .print-header {
+        text-align: center;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #000;
+    }
+    .print-title {
+        font-size: 16pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #000;
+        margin-bottom: 4px;
+    }
+    .print-subtitle {
+        font-size: 10pt;
+        color: #444;
+    }
+    .print-days-grid {
         display: flex;
         flex-direction: column;
-        border-radius: 8px;
-        box-sizing: border-box;
+        gap: 10px;
     }
-    
-    /* Booklet ordering */
-    .accordion-item:nth-child(1) { order: 2; } /* Lunedì */
-    .accordion-item:nth-child(2) { order: 3; } /* Martedì */
-    .accordion-item:nth-child(3) { order: 6; } /* Mercoledì */
-    .accordion-item:nth-child(4) { order: 7; } /* Giovedì */
-    .accordion-item:nth-child(5) { order: 8; } /* Venerdì */
-    .accordion-item:nth-child(6) { order: 5; } /* Sabato */
-    .accordion-item:nth-child(7) { order: 4; } /* Domenica */
-    .accordion-item:nth-child(8) { order: 1; } /* Meal Prep */
-    .accordion-header {
+    .print-day-card {
+        border: 1.5px solid #222;
+        border-radius: 6px;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        background: #fff;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    .print-day-header {
         background: #f0f0f0 !important;
-        color: black !important;
-        border-bottom: 2px solid #000 !important;
-        padding: 6px !important;
-        font-size: 14pt !important;
+        color: #000 !important;
         font-weight: bold;
-        text-align: center;
+        font-size: 12pt;
+        padding: 6px 12px;
+        border-bottom: 1.5px solid #222;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         text-transform: uppercase;
     }
-    .accordion-header .chevron {
-        display: none !important;
+    .print-day-body {
+        padding: 8px 12px;
+        background: #fff !important;
+        color: #000 !important;
     }
-    .accordion-body {
-        max-height: none !important;
-        padding: 8px !important;
-        background: white !important;
-        color: black !important;
-        overflow: visible !important;
-        flex: 1;
+    .print-meal-section {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #bbb;
     }
-    .menu-meal-block {
-        margin-bottom: 5px !important;
-        padding-bottom: 8px !important;
-        page-break-inside: avoid;
+    .print-meal-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
     }
-    .menu-meal-title {
-        color: black !important;
-        font-size: 11pt !important;
-        margin-bottom: 5px !important;
+    .print-meal-name {
+        font-weight: bold;
+        font-size: 10.5pt;
+        color: #000;
+        margin-bottom: 2px;
     }
-    .menu-meal-content {
-        color: black !important;
+    .print-meal-desc {
+        font-size: 9.5pt;
+        color: #222;
+        line-height: 1.35;
     }
-    .meal-detail-item {
-        background: white !important;
-        border-left: 2px solid black !important;
-        padding: 5px 10px !important;
-        margin-top: 4px !important;
-        page-break-inside: avoid;
-    }
-    .meal-detail-key, .meal-detail-value {
-        color: black !important;
+    .print-meal-desc strong {
+        color: #000;
     }
 }
 

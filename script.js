@@ -1071,41 +1071,152 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Load initial views
-    // Booklet export function
-    window.exportMenuBooklet = () => {
-        // Ensure Meal Prep is rendered before trying to grab its HTML
-        if (typeof renderPrep === 'function') {
-            renderPrep();
+    // --- PDF EXPORT LOGIC ---
+    const filterMealForPerson = (rawText, person) => {
+        if (!rawText) return '';
+        if (person === 'Tutti') {
+            return safeStringify(rawText);
         }
 
-        const menuContainer = document.getElementById('menuDaysContainer');
-        const prepContainer = document.getElementById('prepContainer');
+        let str = typeof rawText === 'string' ? rawText : safeStringify(rawText);
 
-        if (menuContainer && prepContainer && prepContainer.innerHTML.trim() !== '') {
-            // Rimuovi eventuali duplicati se esportiamo più volte
-            const existing = document.getElementById('printPrepInjected');
-            if (existing) {
-                existing.remove();
+        const familyCheck = /(Luca|Ilaria|Petra|Per tutti)/i;
+        if (!familyCheck.test(str)) {
+            return str.replace(/\n/g, '<br>');
+        }
+
+        const pattern = /(Luca[^:]*:|Ilaria[^:]*:|Petra[^:]*:|Per tutti[^:]*:|👨‍🍳\s*Procedura[^:]*:|Procedura[^:]*:)/gi;
+        const parts = str.split(pattern);
+
+        if (parts.length <= 1) {
+            return str.replace(/\n/g, '<br>');
+        }
+
+        let result = '';
+        let keepCurrentSection = false;
+
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            if (!part) continue;
+
+            if (part.match(/^(Luca|Ilaria|Petra|Per tutti|👨‍🍳\s*Procedura|Procedura)/i)) {
+                if (part.toLowerCase().includes('procedura')) {
+                    keepCurrentSection = true;
+                    result += (result ? '<br><br>' : '') + `<strong>${part}</strong>`;
+                } else {
+                    const isForTarget = part.toLowerCase().includes(person.toLowerCase());
+                    const isForEveryone = part.toLowerCase().includes('per tutti') || part.toLowerCase().includes('tutti');
+                    if (isForTarget || isForEveryone) {
+                        keepCurrentSection = true;
+                        result += (result ? '<br><br>' : '') + `<strong>${part}</strong>`;
+                    } else {
+                        keepCurrentSection = false;
+                    }
+                }
+            } else {
+                if (i === 0) {
+                    if (part.trim()) result += part.trim().replace(/\n/g, '<br>');
+                } else if (keepCurrentSection) {
+                    const cleanPart = part.trim().replace(/\n/g, '<br>');
+                    if (cleanPart) {
+                        result += ' ' + cleanPart;
+                    }
+                }
+            }
+        }
+
+        return result.trim();
+    };
+
+    window.openExportMenuModal = () => {
+        const modal = document.getElementById('exportMenuModal');
+        if (modal) modal.classList.add('active');
+    };
+
+    window.closeExportMenuModal = () => {
+        const modal = document.getElementById('exportMenuModal');
+        if (modal) modal.classList.remove('active');
+    };
+
+    const exportMenuModalElem = document.getElementById('exportMenuModal');
+    if (exportMenuModalElem) {
+        exportMenuModalElem.addEventListener('click', (e) => {
+            if (e.target === exportMenuModalElem) {
+                closeExportMenuModal();
+            }
+        });
+    }
+
+    window.exportMenuPdf = (person) => {
+        closeExportMenuModal();
+
+        const activeData = activeWeekId ? weeksData[activeWeekId] : null;
+        if (!activeData || !activeData.menu || Object.keys(activeData.menu).length === 0) {
+            alert("Nessun menu presente per la settimana attiva!");
+            return;
+        }
+
+        const printContainer = document.getElementById('printMenuContainer');
+        if (!printContainer) return;
+
+        const giorniSettimana = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+        const sortedEntries = Object.entries(activeData.menu).sort((a, b) => {
+            const idxA = giorniSettimana.indexOf(a[0].toLowerCase());
+            const idxB = giorniSettimana.indexOf(b[0].toLowerCase());
+            return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+        });
+
+        const targetTitle = person === 'Tutti' ? 'Tutta la Famiglia' : `Solo ${person}`;
+        const weekLabel = activeWeekId || 'Settimana';
+
+        let html = `
+            <div class="print-header">
+                <div class="print-title">PastoPronto - Menu Settimanale</div>
+                <div class="print-subtitle"><strong>Destinatario:</strong> ${targetTitle} &nbsp;|&nbsp; <strong>Settimana:</strong> ${weekLabel}</div>
+            </div>
+            <div class="print-days-grid">
+        `;
+
+        sortedEntries.forEach(([giorno, dayData]) => {
+            const prepKey = activeData.prepTimes ? Object.keys(activeData.prepTimes).find(k => k.toLowerCase() === giorno.toLowerCase()) : null;
+            const prepTime = prepKey ? activeData.prepTimes[prepKey] : '';
+
+            const bfast = filterMealForPerson(dayData.breakfast, person);
+            const s1 = filterMealForPerson(dayData.snack1, person);
+            const lunch = filterMealForPerson(dayData.lunch, person);
+            const s2 = filterMealForPerson(dayData.snack2, person);
+            const dinner = filterMealForPerson(dayData.dinner, person);
+
+            let mealSections = '';
+            if (bfast) mealSections += `<div class="print-meal-section"><div class="print-meal-name">🌅 Colazione</div><div class="print-meal-desc">${bfast}</div></div>`;
+            if (s1) mealSections += `<div class="print-meal-section"><div class="print-meal-name">🥪 Spuntino</div><div class="print-meal-desc">${s1}</div></div>`;
+            if (lunch) mealSections += `<div class="print-meal-section"><div class="print-meal-name">🍽️ Pranzo</div><div class="print-meal-desc">${lunch}</div></div>`;
+            if (s2) mealSections += `<div class="print-meal-section"><div class="print-meal-name">🍎 Merenda</div><div class="print-meal-desc">${s2}</div></div>`;
+            if (dinner) mealSections += `<div class="print-meal-section"><div class="print-meal-name">🌙 Cena</div><div class="print-meal-desc">${dinner}</div></div>`;
+
+            if (!mealSections) {
+                mealSections = '<div class="print-meal-desc" style="font-style:italic; color:#777;">Nessun pasto previsto per questa giornata.</div>';
             }
 
-            const injectedPrep = document.createElement('div');
-            injectedPrep.id = 'printPrepInjected';
-            injectedPrep.className = 'accordion-item print-only-prep'; // Nascosto su schermo, visibile in stampa
-            injectedPrep.innerHTML = `
-                <div class="accordion-header">
-                    MEAL PREP
-                </div>
-                <div class="accordion-body">
-                    ${prepContainer.innerHTML}
+            html += `
+                <div class="print-day-card">
+                    <div class="print-day-header">
+                        <span>${giorno.toUpperCase()}</span>
+                        ${prepTime ? `<span style="font-size: 9pt; font-weight: normal; text-transform: none;">⏱️ ${prepTime}</span>` : ''}
+                    </div>
+                    <div class="print-day-body">
+                        ${mealSections}
+                    </div>
                 </div>
             `;
-            menuContainer.appendChild(injectedPrep);
-        }
+        });
 
-        // Il comando di stampa sui cellulari può richiedere tempo o essere asincrono. 
-        // Lasciamo l'elemento nel DOM nascosto invece di rimuoverlo con un timeout,
-        // così non rischiamo che venga distrutto prima che il PDF sia generato.
-        window.print();
+        html += `</div>`;
+        printContainer.innerHTML = html;
+
+        setTimeout(() => {
+            window.print();
+        }, 150);
     };
 
     applyTilePrefs();

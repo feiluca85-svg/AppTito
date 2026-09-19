@@ -138,7 +138,7 @@
         <div id="menuView" class="detail-view" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="font-weight: 300; margin: 0;">Menu Settimanale</h2>
-                <button class="metro-icon-btn" onclick="exportMenuBooklet()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                <button class="metro-icon-btn" onclick="openExportMenuModal()" title="Esporta PDF"><i class="fa-solid fa-file-pdf"></i></button>
             </div>
             <div class="menu-filter-container" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px;">
                 <button class="filter-pill active" onclick="setMenuFilter('Tutti')">Tutti</button>
@@ -147,6 +147,7 @@
                 <button class="filter-pill" onclick="setMenuFilter('Petra')">Petra</button>
             </div>
             <div id="menuDaysContainer"></div>
+            <div id="printMenuContainer" class="print-only-container"></div>
         </div>
 
         <div id="prepView" class="detail-view" style="display: none;">
@@ -186,6 +187,35 @@
                 <button class="metro-btn" id="closeReceiptBtn" style="flex: 1; background: #666;">Annulla</button>
                 <button class="metro-btn" id="confirmReceiptBtn" style="flex: 1; background: #00a300; font-weight: bold;">Detrai dal Budget</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Export Menu Modal -->
+    <div class="modal-overlay" id="exportMenuModal">
+        <div class="modal-content" style="max-width: 420px; text-align: left;">
+            <h2 class="settings-title" style="font-size: 2.2rem; margin-bottom: 8px;">esporta pdf</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 1rem;">Scegli chi includere nell'esportazione del menu:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <button class="metro-btn" onclick="exportMenuPdf('Tutti')" style="background: #0050ef; text-align: left; padding: 14px 18px; display: flex; align-items: center; gap: 14px; font-weight: 600; border: none;">
+                    <i class="fa-solid fa-people-roof" style="font-size: 1.4rem; width: 25px; text-align: center;"></i>
+                    <span style="font-size: 1.1rem;">Tutti insieme (Menu Completo)</span>
+                </button>
+                <button class="metro-btn" onclick="exportMenuPdf('Petra')" style="background: #d80073; text-align: left; padding: 14px 18px; display: flex; align-items: center; gap: 14px; font-weight: 600; border: none;">
+                    <i class="fa-solid fa-child-dress" style="font-size: 1.4rem; width: 25px; text-align: center;"></i>
+                    <span style="font-size: 1.1rem;">Solo Petra</span>
+                </button>
+                <button class="metro-btn" onclick="exportMenuPdf('Luca')" style="background: #008272; text-align: left; padding: 14px 18px; display: flex; align-items: center; gap: 14px; font-weight: 600; border: none;">
+                    <i class="fa-solid fa-user-tie" style="font-size: 1.4rem; width: 25px; text-align: center;"></i>
+                    <span style="font-size: 1.1rem;">Solo Luca</span>
+                </button>
+                <button class="metro-btn" onclick="exportMenuPdf('Ilaria')" style="background: #a20025; text-align: left; padding: 14px 18px; display: flex; align-items: center; gap: 14px; font-weight: 600; border: none;">
+                    <i class="fa-solid fa-user" style="font-size: 1.4rem; width: 25px; text-align: center;"></i>
+                    <span style="font-size: 1.1rem;">Solo Ilaria</span>
+                </button>
+            </div>
+
+            <button class="metro-btn" onclick="closeExportMenuModal()" style="width: 100%; background: #444; border: none; padding: 12px; font-size: 1rem;">Annulla</button>
         </div>
     </div>
 
@@ -234,7 +264,7 @@
                 <!-- Lista generata dinamicamente -->
             </div>
             <div style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem; padding-bottom: 10px;">
-                Versione 63
+                Versione 64
             </div>
         </div>
     </div>
@@ -247,6 +277,6 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
-    <script src="script.js?v=63"></script>
+    <script src="script.js?v=64"></script>
 </body>
 </html>
