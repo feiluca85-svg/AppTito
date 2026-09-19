@@ -562,39 +562,41 @@ select.metro-input:focus {
         color: #444;
     }
     .print-days-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        column-count: 2;
+        column-gap: 12px;
+        display: block;
     }
     .print-day-card {
-        border: 1.5px solid #222;
-        border-radius: 6px;
+        border: 1px solid #222;
+        border-radius: 4px;
         page-break-inside: avoid;
         break-inside: avoid;
         background: #fff;
         overflow: hidden;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        display: inline-block;
+        width: 100%;
     }
     .print-day-header {
         background: #f0f0f0 !important;
         color: #000 !important;
         font-weight: bold;
-        font-size: 12pt;
-        padding: 6px 12px;
-        border-bottom: 1.5px solid #222;
+        font-size: 10pt;
+        padding: 4px 8px;
+        border-bottom: 1px solid #222;
         display: flex;
         justify-content: space-between;
         align-items: center;
         text-transform: uppercase;
     }
     .print-day-body {
-        padding: 8px 12px;
+        padding: 6px 8px;
         background: #fff !important;
         color: #000 !important;
     }
     .print-meal-section {
-        margin-bottom: 8px;
-        padding-bottom: 6px;
+        margin-bottom: 5px;
+        padding-bottom: 4px;
         border-bottom: 1px dashed #bbb;
     }
     .print-meal-section:last-child {
@@ -604,14 +606,14 @@ select.metro-input:focus {
     }
     .print-meal-name {
         font-weight: bold;
-        font-size: 10.5pt;
+        font-size: 9pt;
         color: #000;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
     }
     .print-meal-desc {
-        font-size: 9.5pt;
+        font-size: 8.5pt;
         color: #222;
-        line-height: 1.35;
+        line-height: 1.25;
     }
     .print-meal-desc strong {
         color: #000;
