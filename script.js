@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateHomePreviews();
         } else {
             goHomeBtn.style.display = 'inline-block';
-            openSidebarBtn.style.display = 'none';
+            openSidebarBtn.style.display = 'inline-block';
             headerTitle.textContent = title;
             editModeBtn.style.display = 'none';
         }
@@ -446,7 +446,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveState();
                 updateHomePreviews();
                 closeSidebar();
-                showView(homeView);
+                
+                if (currentActiveView && currentActiveView.id !== 'homeView') {
+                    reRenderActiveView();
+                } else {
+                    showView(homeView, "AppTito", null);
+                }
             });
             weeksList.appendChild(div);
         });
