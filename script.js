@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mostra la settimana corrente sotto il tasto chiudi
         const currentWeekIndicator = document.getElementById('currentWeekIndicator');
         if (currentWeekIndicator) {
-            currentWeekIndicator.textContent = getISOWeekString();
+            currentWeekIndicator.textContent = activeWeekId || getISOWeekString();
         }
         
         renderSidebar();
